@@ -9,15 +9,8 @@ const port = process.env.SERVICE_PORT;
 
 router.post('/Estado', async (req: Request, res: Response) => {
     const estadoDTO = req.body;
-    return res.json(await createEstado(estadoDTO));
-    // try {
-    //     const estadoDTO = req.body;
-    //     const novoEstado = await createEstado(estadoDTO);
-    //     return res.status(200).json({'msg': 'Cadastrado um novo estado.'});
-    // } catch (error) {
-    //     console.log(error);
-    //     return res.status(500).json({'msg': 'Houve uma falha ao tentar cadastrar um novo estado.'});
-    // }
+    const novoEstado = await createEstado(estadoDTO);
+    return res.status(novoEstado.status).json(novoEstado.msg);
 });
 
 router.get('/', (req, res) => {

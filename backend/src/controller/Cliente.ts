@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 const prisma = new PrismaClient();
 
-async function createEstado(estado: EstadoDTO): Promise<{status: string, msg: string}> {
+async function createEstado(estado: EstadoDTO): Promise<{status: number, msg: string}> {
     try {
         let novoEstado = await prisma.tbestado.create({
             data: {
@@ -14,10 +14,10 @@ async function createEstado(estado: EstadoDTO): Promise<{status: string, msg: st
                 pais: estado.pais
             }
         });        
-        return {status: '200', msg: 'Novo estado cadastrado com sucesso.'};
+        return {status: 200, msg: 'Novo estado cadastrado com sucesso.'};
     } catch (error) {
         console.log(error);
-        return {status: '500', msg: error instanceof Error ? error.message : 'Erro desconhecido'};
+        return {status: 500, msg: error instanceof Error ? error.message : 'Erro desconhecido'};
     }
 }
 

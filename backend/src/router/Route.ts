@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 const router = express.Router();
-import { createEstado } from '../controller/Cliente';
+import { createEstado, updateEstado } from '../controller/Cliente';
 
 dotenv.config();
 
@@ -13,8 +13,10 @@ router.post('/Estado', async (req: Request, res: Response) => {
     return res.status(novoEstado.status).json(novoEstado.msg);
 });
 
-router.get('/', (req, res) => {
-    return res.json({'msg': `Server online on port ${port} para teste de rotas`});
+router.put('/Estado/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const estadoDTO = req.body;
+    const atualizaEstado = await updateEstado(estadoDTO, Number(id));
 });
 
 module.exports = router;

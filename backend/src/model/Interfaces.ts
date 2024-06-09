@@ -1,5 +1,5 @@
 export interface EstadoDTO {
-    nome: String;
-    uf: String;
-    pais: String;
+    nome: string;
+    uf: string;
+    pais: string;
 }

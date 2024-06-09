@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { EstadoDTO, reqEstadoDTO } from "../model/Interfaces";
 import dotenv from 'dotenv';
+import { response } from "express";
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -60,6 +61,20 @@ async function selectEstado(): Promise<reqEstadoDTO[]> {
         };
     });
     return reqestadosDTO;
+};
+
+async function selectEstadoId(id: number): Promise<reqEstadoDTO | null> {
+    const estado = await prisma.tbestado.findUnique({ where: { id: id }});
+    if(estado){
+        const responseDTO: reqEstadoDTO = {
+            id: estado.id,
+            nome: estado.nome,
+            uf: estado.uf,
+            pais: estado.pais
+        };
+        return responseDTO;
+    }
+    return null;
 }
 
-export { createEstado, updateEstado, deleteEstado, selectEstado };
+export { createEstado, updateEstado, deleteEstado, selectEstado, selectEstadoId };

@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 const router = express.Router();
-import { createEstado, updateEstado } from '../controller/Cliente';
+import { createEstado, deleteEstado, selectEstado, updateEstado } from '../controller/ClienteController';
 
 dotenv.config();
 
@@ -21,6 +21,19 @@ router.put('/Estado/:id', async (req: Request, res: Response) => {
     return res.status(atualizaEstado.status).json({msg: atualizaEstado.msg});
 });
 
+router.delete('/Estado/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const deletarEstado = await deleteEstado(parseInt(id));
+    return res.status(deletarEstado.status).json({msg: deletarEstado.msg});
+});
+
+router.get('/Estado', async (req: Request, res: Response) => {
+    const estados = await selectEstado();
+    if(estados.length > 0){
+        return res.status(200).json(estados);
+    }
+    return res.status(200).json({msg: 'Nenhum registro para mostrar.'});
+});
 
 
 module.exports = router;

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { EstadoDTO } from "../model/Interfaces";
+import { EstadoDTO, reqEstadoDTO } from "../model/Interfaces";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,8 +12,8 @@ async function createEstado(estado: EstadoDTO): Promise<{status: number, msg: st
     } catch (error) {
         console.log(error);
         return {status: 500, msg: error instanceof Error ? error.message : 'Erro desconhecido'};
-    }
-}
+    };
+};
 
 async function updateEstado(estado: EstadoDTO, id: number): Promise<{status: number, msg: string}> {
     try {
@@ -32,7 +32,34 @@ async function updateEstado(estado: EstadoDTO, id: number): Promise<{status: num
     } catch (error) {
         console.log(error);
         return {status: 500, msg: error instanceof Error ? error.message : 'Erro desconhecido'};
-    }
+    };
+};
+
+async function deleteEstado(id: number): Promise<{status: number, msg: string}> {
+    try {
+        const estado = await prisma.tbestado.findUnique({where: { id: id }});
+        if(estado){
+            await prisma.tbestado.delete({ where: {id: id }});
+            return {status: 200, msg: 'Estado deletado com sucesso.'};
+        }
+        return {status: 500, msg: 'Não foi possivel deletar o estado.'};
+    } catch (error) {
+        console.log(error);
+        return {status: 500, msg: error instanceof Error ? error.message : 'Erro desconhecido'};
+    };
+};
+
+async function selectEstado(): Promise<reqEstadoDTO[]> {
+    const estados = await prisma.tbestado.findMany({orderBy: [{ id: 'asc' }]});
+    const reqestadosDTO: reqEstadoDTO[] = estados.map((e) => {
+        return {
+            id: e.id,
+            nome: e.nome,
+            uf: e.uf,
+            pais: e.pais
+        };
+    });
+    return reqestadosDTO;
 }
 
-export { createEstado, updateEstado };
+export { createEstado, updateEstado, deleteEstado, selectEstado };

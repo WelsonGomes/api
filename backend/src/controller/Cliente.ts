@@ -17,11 +17,18 @@ async function createEstado(estado: EstadoDTO): Promise<{status: number, msg: st
 
 async function updateEstado(estado: EstadoDTO, id: number): Promise<{status: number, msg: string}> {
     try {
-        await prisma.tbestado.update({
-            where: {id: id},
-            data: estado
+        const response = await prisma.tbestado.update({
+            where: { id: id },
+            data: {
+                nome: estado.nome,
+                uf: estado.uf,
+                pais: estado.pais
+            }
         });
-        return {status: 200, msg: 'Atualizado os dados do estado.'};
+        if (response) {
+            return {status: 200, msg: 'Atualizado os dados do estado.'};
+        } 
+        return {status: 500, msg: 'Houve uma falha ao alterar o estado.'};
     } catch (error) {
         console.log(error);
         return {status: 500, msg: error instanceof Error ? error.message : 'Erro desconhecido'};

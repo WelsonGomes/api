@@ -13,19 +13,20 @@ model tbestado {
   nome String @db.VarChar(100) @unique
   uf String @db.VarChar(2) @unique
   pais String @db.VarChar(100)
-// cidade tbcidade[]
+  cidade tbcidade[]
 //  cliente tbcliente[]
 }
 
-// model tbcidade {
-//   id Int @id @default(autoincrement())
-//   nome String @db.VarChar(100)
-//   estadoid Int
-//   estado tbestado @relation(fields: [estadoid], references: [id])
-//   cidade tbcliente[]
+model tbcidade {
+  id Int @id @default(autoincrement())
+  nome String @db.VarChar(100)
+  estadoid Int
+  estado tbestado @relation(fields: [estadoid], references: [id])
+  codigoibge Int
+//  cidade tbcliente[]
 
-//   @@unique([nome, estadoid])
-// }
+  @@unique([nome, estadoid])
+}
 
 // model tbcliente {
 //   id Int @id @default(autoincrement())

@@ -1,19 +1,15 @@
 import { PrismaClient } from "@prisma/client";
-import fs from 'fs/promises';
+import { publicCidades } from "./execucao/Cidades";
+import { publicEstados } from "./execucao/Estados";
+
 
 const prisma = new PrismaClient();
 
 async function main() {
-    const path = require('path');
-    const filePath = path.join(__dirname, 'arquivo', 'Estado.txt');
-    const data = await fs.readFile(filePath, 'utf-8');
-    const estados = JSON.parse(data);
-    for(const e of estados){
-        await prisma.tbestado.create({
-            data: e
-        });
-    };
-    console.log('Finalizado a criação dos estados.');
+    const publicarEstado = false;
+    const publicarCidade = true;
+    if(publicarEstado){ await publicEstados() };
+    if(publicarCidade){ await publicCidades() };
 };
 
 main().catch(e => {

@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { CidadeDTO, reqCidadeDTO } from "../model/Interfaces";
+import { CidadeDTO, PaginatedResponse, reqCidadeDTO } from "../model/Interfaces";
 import dotenv from 'dotenv';
 
 dotenv.config();
-const prisma = new PrismaClient();
 
-async function createCidade(cidade: CidadeDTO): Promise<{status: number, msg: string}> {
+async function createCidade(prisma: PrismaClient, cidade: CidadeDTO): Promise<{status: number, msg: string}> {
     try {
         await prisma.tbcidade.create({data: cidade});
         return {status: 200, msg: 'Nova cidade cadastrada com sucesso.'};
@@ -15,7 +14,7 @@ async function createCidade(cidade: CidadeDTO): Promise<{status: number, msg: st
     }
 };
 
-async function updateCidade(cidade: CidadeDTO, id: number): Promise<{status: number, msg: string}> {
+async function updateCidade(prisma: PrismaClient, cidade: CidadeDTO, id: number): Promise<{status: number, msg: string}> {
     try {
         const response = await prisma.tbcidade.update({
             where: {id: id},
@@ -28,7 +27,7 @@ async function updateCidade(cidade: CidadeDTO, id: number): Promise<{status: num
     }
 };
 
-async function deleteCidade(id: number): Promise<{status: number, msg: string}> {
+async function deleteCidade(prisma: PrismaClient, id: number): Promise<{status: number, msg: string}> {
     try {
         const response = await prisma.tbcidade.delete({where: {id: id}});
         if(response){
@@ -41,8 +40,13 @@ async function deleteCidade(id: number): Promise<{status: number, msg: string}> 
     }
 };
 
-async function selectCidade(): Promise<reqCidadeDTO[]> {
+async function selectCidade(prisma: PrismaClient, page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<reqCidadeDTO>> {
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+    const total = await prisma.tbcidade.count();
     const response = await prisma.tbcidade.findMany({
+        skip: skip,
+        take: take,
         orderBy: { nome: 'asc' },
         include: { estado: true }
     });
@@ -60,10 +64,15 @@ async function selectCidade(): Promise<reqCidadeDTO[]> {
             }
         };
     });
-    return reqcidadeDTO;
+    return {
+        data: reqcidadeDTO,
+        total: total,
+        page: page,
+        pageSize: pageSize
+    };
 };
 
-async function selectCidadeId(id: number): Promise<reqCidadeDTO | null> {
+async function selectCidadeId(prisma: PrismaClient, id: number): Promise<reqCidadeDTO | null> {
     const response = await prisma.tbcidade.findUnique({
         where: { id: id },
         include: { estado: true }

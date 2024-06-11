@@ -3,9 +3,8 @@ import { EstadoDTO, reqEstadoDTO } from "../model/Interfaces";
 import dotenv from 'dotenv';
 
 dotenv.config();
-const prisma = new PrismaClient();
 
-async function createEstado(estado: EstadoDTO): Promise<{status: number, msg: string}> {
+async function createEstado(prisma: PrismaClient, estado: EstadoDTO): Promise<{status: number, msg: string}> {
     try {
         await prisma.tbestado.create({data: estado});        
         return {status: 200, msg: 'Novo estado cadastrado com sucesso.'};
@@ -15,7 +14,7 @@ async function createEstado(estado: EstadoDTO): Promise<{status: number, msg: st
     };
 };
 
-async function updateEstado(estado: EstadoDTO, id: number): Promise<{status: number, msg: string}> {
+async function updateEstado(prisma: PrismaClient, estado: EstadoDTO, id: number): Promise<{status: number, msg: string}> {
     try {
         const response = await prisma.tbestado.update({
             where: { id: id },
@@ -35,7 +34,7 @@ async function updateEstado(estado: EstadoDTO, id: number): Promise<{status: num
     };
 };
 
-async function deleteEstado(id: number): Promise<{status: number, msg: string}> {
+async function deleteEstado(prisma: PrismaClient, id: number): Promise<{status: number, msg: string}> {
     try {
         const estado = await prisma.tbestado.findUnique({where: { id: id }});
         if(estado){
@@ -49,7 +48,7 @@ async function deleteEstado(id: number): Promise<{status: number, msg: string}> 
     };
 };
 
-async function selectEstado(): Promise<reqEstadoDTO[]> {
+async function selectEstado(prisma: PrismaClient, ): Promise<reqEstadoDTO[]> {
     const estados = await prisma.tbestado.findMany({orderBy: [{ id: 'asc' }]});
     const reqestadosDTO: reqEstadoDTO[] = estados.map((e) => {
         return {
@@ -62,7 +61,7 @@ async function selectEstado(): Promise<reqEstadoDTO[]> {
     return reqestadosDTO;
 };
 
-async function selectEstadoId(id: number): Promise<reqEstadoDTO | null> {
+async function selectEstadoId(prisma: PrismaClient, id: number): Promise<reqEstadoDTO | null> {
     const estado = await prisma.tbestado.findUnique({ where: { id: id }});
     if(estado){
         const responseDTO: reqEstadoDTO = {

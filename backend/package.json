@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon --watch 'src/' --exec 'ts-node src/server.ts' -e ts",
     "dev": "nodemon src/server.ts",
-    "seed": "ts-node prisma/seed/Seed.ts"
+    "seed": "ts-node prisma/seed/Seed.ts",
+    "build": "tsc",
+    "debug": "npm run build && node --inspect-brk=9229 dist/server.js"
   },
   "keywords": [],
   "author": "",

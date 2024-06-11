@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 const router = express.Router();
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
-import { createCliente } from '../controller/ClienteController';
+import { createCliente, updateCliente } from '../controller/ClienteController';
 
 dotenv.config();
 
@@ -88,6 +88,13 @@ router.post('/Cliente', async (req: Request, res: Response) => {
     const cliente = req.body;
     const novoCliente = await createCliente(req.prisma, cliente);
     return res.status(novoCliente.status).json({msg: novoCliente.msg});
-})
+});
+
+router.put('/Cliente/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const cliente = req.body;
+    const atualizaCliente = await updateCliente(req.prisma, cliente, parseInt(id));
+    return res.status(atualizaCliente.status).json({msg: atualizaCliente.msg});
+});
 
 module.exports = router;

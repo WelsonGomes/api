@@ -1,3 +1,4 @@
+//Interface de dados do objeto de estado
 export interface EstadoDTO {
     nome: string;
     uf: string;
@@ -9,4 +10,72 @@ export interface reqEstadoDTO {
     nome: string;
     uf: string;
     pais: string;
+}
+
+//Interface de dados do objeto de cidade
+export interface CidadeDTO {
+    nome: string;
+    estadoid: number;
+    codigoibge: number;
+}
+
+export interface reqCidadeDTO {
+    id: number;
+    nome: string;
+    estadoid: number;
+    codigoibge: number;
+    estado: reqEstadoDTO;
+}
+
+export interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    pageSize: number;
+}
+
+//Interface de dados do objeto de Cliente
+export interface ClienteDTO {
+    cnpjcpf: string;
+    razaosocial: string;
+    fantasia?: string;
+    datacriacao: string;
+    contratoid: number;
+    responsavel?: string;
+    situacao: number; 
+    email: string;
+    telefone?: string;
+    celular?: string;
+    estadoid: number;
+    cidadeid: number;
+    cep?: string;
+    logradouro?: string;
+    numero?: number;
+    bairro?: string;
+    complemento?: string;
+    datacadastro: string;
+}
+
+export interface ClienteDTO {
+    id: number;
+    cnpjcpf: string;
+    razaosocial: string;
+    fantasia?: string;
+    datacriacao: string;
+    contratoid: number;
+    responsavel?: string;
+    situacao: number; 
+    email: string;
+    telefone?: string;
+    celular?: string;
+    estadoid: number;
+    cidadeid: number;
+    cep?: string;
+    logradouro?: string;
+    numero?: number;
+    bairro?: string;
+    complemento?: string;
+    datacadastro: string;
+    estado: reqEstadoDTO;
+    cidade: reqCidadeDTO;
 }

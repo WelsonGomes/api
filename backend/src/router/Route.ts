@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 const router = express.Router();
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
+import { createCliente } from '../controller/ClienteController';
 
 dotenv.config();
 
@@ -81,5 +82,12 @@ router.get('/Cidade/:id', async (req: Request, res: Response) => {
     }
     return res.status(200).json({msg: 'Não foi encontrado esta cidade.'});
 });
+
+//rotas do objeto de cliente
+router.post('/Cliente', async (req: Request, res: Response) => {
+    const cliente = req.body;
+    const novoCliente = await createCliente(req.prisma, cliente);
+    return res.status(novoCliente.status).json({msg: novoCliente.msg});
+})
 
 module.exports = router;

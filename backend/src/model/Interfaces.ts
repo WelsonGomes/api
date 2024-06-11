@@ -33,3 +33,49 @@ export interface PaginatedResponse<T> {
     page: number;
     pageSize: number;
 }
+
+//Interface de dados do objeto de Cliente
+export interface ClienteDTO {
+    cnpjcpf: string;
+    razaosocial: string;
+    fantasia?: string;
+    datacriacao: string;
+    contratoid: number;
+    responsavel?: string;
+    situacao: number; 
+    email: string;
+    telefone?: string;
+    celular?: string;
+    estadoid: number;
+    cidadeid: number;
+    cep?: string;
+    logradouro?: string;
+    numero?: number;
+    bairro?: string;
+    complemento?: string;
+    datacadastro: string;
+}
+
+export interface ClienteDTO {
+    id: number;
+    cnpjcpf: string;
+    razaosocial: string;
+    fantasia?: string;
+    datacriacao: string;
+    contratoid: number;
+    responsavel?: string;
+    situacao: number; 
+    email: string;
+    telefone?: string;
+    celular?: string;
+    estadoid: number;
+    cidadeid: number;
+    cep?: string;
+    logradouro?: string;
+    numero?: number;
+    bairro?: string;
+    complemento?: string;
+    datacadastro: string;
+    estado: reqEstadoDTO;
+    cidade: reqCidadeDTO;
+}

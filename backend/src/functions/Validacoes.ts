@@ -56,7 +56,6 @@ async function validarCNPJ(cnpj: string): Promise<boolean> {
 
 async function getValidaCpfCnpj(cpfcnpj: string): Promise<boolean> {
     const valor = cpfcnpj.replace(/[^\d]+/g, '');
-    console.log(valor);
     if (valor.length == 14) {
         return await validarCNPJ(valor);
     } else if (valor.length == 11) {

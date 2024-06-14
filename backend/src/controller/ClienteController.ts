@@ -2,6 +2,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { ClienteDTO } from '../model/Interfaces';
 import dotenv from 'dotenv';
 import { getValidaCpfCnpj } from '../functions/Validacoes';
+import { tratamentoError } from "../messaging/Excepitions";
 
 dotenv.config();
 
@@ -35,21 +36,10 @@ async function createCliente(prisma: PrismaClient, cliente: ClienteDTO): Promise
                 return {status: 200, msg: 'Novo cliente cadastrado com sucesso.'};
             } catch (error) {
                 console.log(error);
-                /*if(Error.prototype.name === 'Error'){
-                    return {status: 400, msg: 'Não foi possivel connectar ao banco de dados, verifique sua conexão e tente novamente'};
-                } else*/ 
-                if(error instanceof Prisma.PrismaClientKnownRequestError){
-                    if(error.code === 'P2002'){
-                        const target = (error.meta as { target: string[] }).target;
-                        return {status: 400, msg: `Não é possivel inserir um ${target[0]} já existente. favor verifique`};
-                    };
-                    if (error.code === '23514') {
-                        const meta = error.meta;
-                        const detail = meta?.detail;
-                        return { status: 400, msg: `Erro: A nova linha para a tabela "tbcliente" viola a restrição de verificação. Detalhes: ${detail}` };
-                    }
-                } else 
-                return {status: 400, msg: `Houve um erro ao inserir este cliente no banco de dados. ${error instanceof Error ? error.message: ''}`};
+                if(error instanceof Error){
+                    const tratamento = await tratamentoError(error);
+                    return {status: tratamento.status, msg: tratamento.msg};
+                }
             };
         };
         return {status: 400, msg: 'Este CnpjCpf é invalido. Favor verifique.'};

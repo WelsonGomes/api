@@ -1,7 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { ClienteDTO } from '../model/Interfaces';
 import dotenv from 'dotenv';
 import { getValidaCpfCnpj } from '../functions/Validacoes';
+import { tratamentoError } from "../messaging/Excepitions";
 
 dotenv.config();
 
@@ -9,29 +10,37 @@ async function createCliente(prisma: PrismaClient, cliente: ClienteDTO): Promise
     try {
         const bCnpjCpf = await getValidaCpfCnpj(cliente.cnpjcpf);
         if(bCnpjCpf){
-            await prisma.tbcliente.create({
-                data: {
-                    cnpjcpf: cliente.cnpjcpf,
-                    razaosocial: cliente.razaosocial,
-                    fantasia: cliente.fantasia,
-                    datacriacao: new Date(cliente.datacriacao), 
-                    contratoid: cliente.contratoid,
-                    responsavel: cliente.responsavel,
-                    situacao: cliente.situacao,
-                    email: cliente.email,
-                    telefone: cliente.telefone,
-                    celular: cliente.celular,
-                    estadoid: cliente.estadoid,
-                    cidadeid: cliente.cidadeid,
-                    cep: cliente.cep,
-                    logradouro: cliente.logradouro,
-                    numero: cliente.numero,
-                    bairro: cliente.bairro,
-                    complemento: cliente.complemento,
-                    datacadastro: new Date(cliente.datacadastro) 
+            try {
+                await prisma.tbcliente.create({
+                    data: {
+                        cnpjcpf: cliente.cnpjcpf.replace(/[^\d]+/g, ''),
+                        razaosocial: cliente.razaosocial,
+                        fantasia: cliente.fantasia,
+                        datacriacao: new Date(cliente.datacriacao), 
+                        contratoid: cliente.contratoid,
+                        responsavel: cliente.responsavel,
+                        situacao: cliente.situacao,
+                        email: cliente.email,
+                        telefone: cliente.telefone,
+                        celular: cliente.celular,
+                        estadoid: cliente.estadoid,
+                        cidadeid: cliente.cidadeid,
+                        cep: cliente.cep,
+                        logradouro: cliente.logradouro,
+                        numero: cliente.numero,
+                        bairro: cliente.bairro,
+                        complemento: cliente.complemento,
+                        datacadastro: new Date(cliente.datacadastro) 
+                    }
+                });
+                return {status: 200, msg: 'Novo cliente cadastrado com sucesso.'};
+            } catch (error) {
+                console.log(error);
+                if(error instanceof Error){
+                    const tratamento = await tratamentoError(error);
+                    return {status: tratamento.status, msg: tratamento.msg};
                 }
-            });
-            return {status: 200, msg: 'Novo cliente cadastrado com sucesso.'};
+            };
         };
         return {status: 400, msg: 'Este CnpjCpf é invalido. Favor verifique.'};
     } catch (error) {
@@ -49,7 +58,7 @@ async function updateCliente(prisma: PrismaClient, cliente: ClienteDTO, id: numb
                 await prisma.tbcliente.update({
                     where: { id: id },
                     data: {
-                        cnpjcpf: cliente.cnpjcpf,
+                        cnpjcpf: cliente.cnpjcpf.replace(/[^\d]+/g, ''),
                         razaosocial: cliente.razaosocial,
                         fantasia: cliente.fantasia,
                         datacriacao: new Date(cliente.datacriacao), 

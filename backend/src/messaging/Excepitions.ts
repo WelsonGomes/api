@@ -9,16 +9,16 @@ function extractErrorDetails(errorString: string): { code: string, message: stri
 
 if (messageMatch) {
     const extractedMessage = messageMatch[1];
-    console.log(extractedMessage); // Exibe a mensagem extraída
+    console.log(extractedMessage); 
 
     const cleanedMessage = extractedMessage.replace(/["\\]/g, '');
-    console.log(cleanedMessage); // Exibe a mensagem após remoção de caracteres indesejados
+    console.log(cleanedMessage); 
 
     const matchedMessage = cleanedMessage.match(/message:([^,]+)/);
-    console.log(matchedMessage); // Exibe o resultado do match
+    console.log(matchedMessage); 
 
     if (matchedMessage) {
-        message = matchedMessage[1]; // Atribui o valor extraído
+        message = matchedMessage[1]; 
     } else {
         console.error('Padrão de mensagem não encontrado.');
     }

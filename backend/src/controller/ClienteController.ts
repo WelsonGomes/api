@@ -48,7 +48,7 @@ async function createCliente(prisma: PrismaClient, cliente: ClienteDTO): Promise
         return { status: 500, msg: 'Houve um erro crítico no sistema' };
     } finally {
         await prisma.$disconnect();
-    }
+    };
 };
 
 async function updateCliente(prisma: PrismaClient, cliente: ClienteDTO, id: number): Promise<{status: number, msg: string}> {
@@ -127,16 +127,16 @@ async function deleteCliente(prisma: PrismaClient, id: number): Promise<{status:
 
 async function selectCliente(prisma: PrismaClient, page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<reqClienteDTO>> {
     try {
-        const result = await prisma.$transaction(async (prismaTransaction) => {
-            const skip = (page - 1) * pageSize;
-            const take = pageSize;
-            const total = await prismaTransaction.tbcliente.count();
-            const response = await prismaTransaction.tbcliente.findMany({
-                skip: skip,
-                take: take,
-                orderBy: { razaosocial: 'asc' },
-                include: { estado: true, cidade: true }
-            });
+        const skip = (page - 1) * pageSize;
+        const take = pageSize;
+        const total = await prisma.tbcliente.count();
+        const response = await prisma.tbcliente.findMany({
+            skip: skip,
+            take: take,
+            orderBy: { razaosocial: 'asc' },
+            include: { estado: true, cidade: true }
+        });
+        if (response) {
             const clientes: reqClienteDTO[] = response.map((c) => {
                 return {
                     id: c.id,
@@ -172,30 +172,15 @@ async function selectCliente(prisma: PrismaClient, page: number = 1, pageSize: n
                     }
                 }
             });
-            return  {
-                data: clientes,
-                total: total,
-                page: page,
-                pageSize: pageSize
-            };
-        });
-        return result;
+            return  { data: clientes, total: total, page: page, pageSize: pageSize };
+        }
+        return  { data: [], total: 0, page: page, pageSize: pageSize }; 
     } catch (error) {
         if (error instanceof Error) {
             const tratamento = await tratamentoError(error);
-            return  {
-                data: [],
-                total: 0,
-                page: page,
-                pageSize: pageSize
-            };
+            return  { data: [], total: 0, page: page, pageSize: pageSize }; 
         }
-        return  {
-            data: [],
-            total: 0,
-            page: page,
-            pageSize: pageSize
-        };
+        return  { data: [], total: 0, page: page, pageSize: pageSize }; 
     } finally {
         await prisma.$disconnect();
     }
@@ -203,50 +188,47 @@ async function selectCliente(prisma: PrismaClient, page: number = 1, pageSize: n
 
 async function selectClienteId(prisma: PrismaClient, id: number): Promise<reqClienteDTO | null> {
     try {
-        const result = await prisma.$transaction(async (prismaTransaction) => {
-            const response = await prismaTransaction.tbcliente.findUnique({ 
-                where: { id: id },
-                include: { estado: true, cidade: true }
-            });
-            if(!response) {
-                return null;
-            }
-            const cliente: reqClienteDTO = {
-                id: response.id,
-                cnpjcpf: response.cnpjcpf,
-                razaosocial: response.razaosocial,
-                fantasia: response.fantasia,
-                datacriacao: response.datacriacao,
-                contratoid: response.contratoid,
-                responsavel: response.responsavel,
-                situacao: response.situacao,
-                email: response.email,
-                telefone: response.telefone,
-                celular: response.celular,
-                estadoid: response.estadoid,
-                cidadeid: response.cidadeid,
-                cep: response.cep,
-                logradouro: response.logradouro,
-                numero: response.numero,
-                bairro: response.bairro,
-                complemento: response.complemento,
-                datacadastro: response.datacadastro,
-                cidade: {
-                    id: response.cidade.id,
-                    nome: response.cidade.nome,
-                    estadoid: response.cidade.estadoid,
-                    codigoibge: response.cidade.codigoibge,
-                    estado: {
-                        id: response.estado.id,
-                        nome: response.estado.nome,
-                        uf: response.estado.uf,
-                        pais: response.estado.pais
-                    }
+        const response = await prisma.tbcliente.findUnique({ 
+            where: { id: id },
+            include: { estado: true, cidade: true }
+        });
+        if(!response) {
+            return null;
+        }
+        const cliente: reqClienteDTO = {
+            id: response.id,
+            cnpjcpf: response.cnpjcpf,
+            razaosocial: response.razaosocial,
+            fantasia: response.fantasia,
+            datacriacao: response.datacriacao,
+            contratoid: response.contratoid,
+            responsavel: response.responsavel,
+            situacao: response.situacao,
+            email: response.email,
+            telefone: response.telefone,
+            celular: response.celular,
+            estadoid: response.estadoid,
+            cidadeid: response.cidadeid,
+            cep: response.cep,
+            logradouro: response.logradouro,
+            numero: response.numero,
+            bairro: response.bairro,
+            complemento: response.complemento,
+            datacadastro: response.datacadastro,
+            cidade: {
+                id: response.cidade.id,
+                nome: response.cidade.nome,
+                estadoid: response.cidade.estadoid,
+                codigoibge: response.cidade.codigoibge,
+                estado: {
+                    id: response.estado.id,
+                    nome: response.estado.nome,
+                    uf: response.estado.uf,
+                    pais: response.estado.pais
                 }
             }
-            return cliente;
-        });
-        return result;
+        }
+        return cliente;
     } catch (error) {
         if (error instanceof Error) {
             const tratamento = await tratamentoError(error);

@@ -5,48 +5,83 @@ import { tratamentoError } from '../messaging/Excepitions';
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
 import { createCliente, deleteCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
-import { CidadeDTO, PaginatedResponse, reqCidadeDTO } from '../model/Interfaces';
 
 dotenv.config();
 
-//rotas do objeto de estado
+/************************ROTAS DO OBJETO CLIENTE**************************/
+
+//rota para cadastrar um novo estado
 router.post('/Estado', async (req: Request, res: Response) => {
-    const estadoDTO = req.body;
-    const novoEstado = await createEstado(req.prisma, estadoDTO);
-    return res.status(novoEstado.status).json({msg: novoEstado.msg});
+    try {
+        const estadoDTO = req.body;
+        const novoEstado = await createEstado(req.prisma, estadoDTO);
+        return res.status(novoEstado.status).json({msg: novoEstado.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return { status: tratamento.status, msg: tratamento.msg };
+        }
+        return { status: 500, msg: 'Houve um erro crítico no sistema' };
+    };
 });
 
-router.put('/Estado/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const estadoDTO = req.body;
-    const atualizaEstado = await updateEstado(req.prisma,estadoDTO, parseInt(id));
-    return res.status(atualizaEstado.status).json({msg: atualizaEstado.msg});
+//rota para atualizar um estado
+router.put('/Estado', async (req: Request, res: Response) => {
+    try {
+        const id = req.query.id as string;
+        const estadoDTO = req.body;
+        const atualizaEstado = await updateEstado(req.prisma,estadoDTO, parseInt(id));
+        return res.status(atualizaEstado.status).json({msg: atualizaEstado.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return { status: tratamento.status, msg: tratamento.msg };
+        }
+        return { status: 500, msg: 'Houve um erro crítico no sistema' };
+    };
 });
 
-router.delete('/Estado/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const deletarEstado = await deleteEstado(req.prisma,parseInt(id));
-    return res.status(deletarEstado.status).json({msg: deletarEstado.msg});
+//rota para deletar um estado
+router.delete('/Estado', async (req: Request, res: Response) => {
+    try {
+        const id = req.query.id as string;
+        const deletarEstado = await deleteEstado(req.prisma,parseInt(id));
+        return res.status(deletarEstado.status).json({msg: deletarEstado.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return { status: tratamento.status, msg: tratamento.msg };
+        }
+        return { status: 500, msg: 'Houve um erro crítico no sistema' };
+    };
 });
 
+//rota para selecionar os estados ou um especificado pelo filtro
 router.get('/Estado', async (req: Request, res: Response) => {
-    const estados = await selectEstado(req.prisma);
-    if(estados.length > 0){
-        return res.status(200).json(estados);
-    }
-    return res.status(200).json({msg: 'Nenhum registro para mostrar.'});
+    try {
+        const id = req.query.id as string;
+        let estados;
+        if(parseInt(id) > 0){
+            estados = await selectEstadoId(req.prisma,parseInt(id));
+        } else {
+            estados = await selectEstado(req.prisma);
+        };
+        if(estados){
+            return res.status(200).json(estados);
+        }
+        return res.status(200).json({msg: 'Nenhum registro para mostrar.'});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return { status: tratamento.status, msg: tratamento.msg };
+        }
+        return { status: 500, msg: 'Houve um erro crítico no sistema' };
+    };
 });
 
-router.get('/Estado/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const estado = await selectEstadoId(req.prisma,parseInt(id));
-    if(estado){
-        return res.status(200).json(estado);
-    }
-    return res.status(200).json({msg: 'Não foi encontrado este estado.'});
-});
+/************************ROTAS DO OBJETO CIDADE**************************/
 
-//rotas do objeto de cidade
+//rota para cadastrar uma nova cidade
 router.post('/Cidade', async (req: Request, res: Response) => {
     try {
         const cidadeDTO = req.body;
@@ -61,6 +96,7 @@ router.post('/Cidade', async (req: Request, res: Response) => {
     };
 });
 
+//rota para atualizar os dados de uma cidade
 router.put('/Cidade', async (req: Request, res: Response) => {
     try {
         const id = req.query.id as string;
@@ -76,6 +112,7 @@ router.put('/Cidade', async (req: Request, res: Response) => {
     };
 });
 
+//rota para deletar uma cidade
 router.delete('/Cidade', async (req: Request, res: Response) => {
     try {
         const id = req.query.id as string;
@@ -115,8 +152,7 @@ router.get('/Cidade', async (req: Request, res: Response) => {
     };
 });
 
-
-
+/************************ROTAS DO OBJETO CLIENTE**************************/
 
 //rota para cadastrar um cliente
 router.post('/Cliente', async (req: Request, res: Response) => {

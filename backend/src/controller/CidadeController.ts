@@ -18,7 +18,9 @@ async function createCidade(prisma: PrismaClient, cidade: CidadeDTO): Promise<{s
             return { status: tratamento.status, msg: tratamento.msg };
         }
         return { status: 500, msg: 'Houve um erro crítico no sistema' };
-    }
+    } finally {
+        await prisma.$disconnect();
+    };
 };
 
 async function updateCidade(prisma: PrismaClient, cidade: CidadeDTO, id: number): Promise<{status: number, msg: string}> {
@@ -37,6 +39,8 @@ async function updateCidade(prisma: PrismaClient, cidade: CidadeDTO, id: number)
             return { status: tratamento.status, msg: tratamento.msg };
         }
         return { status: 500, msg: 'Houve um erro crítico no sistema' };
+    } finally {
+        await prisma.$disconnect();
     };
 };
 
@@ -56,21 +60,23 @@ async function deleteCidade(prisma: PrismaClient, id: number): Promise<{status: 
             return { status: tratamento.status, msg: tratamento.msg };
         }
         return { status: 500, msg: 'Houve um erro crítico no sistema' };
-    }
+    } finally {
+        await prisma.$disconnect();
+    };
 };
 
 async function selectCidade(prisma: PrismaClient, page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<reqCidadeDTO>> {
     try {
-        const result = await prisma.$transaction(async (prismaTransaction) => {
-            const skip = (page - 1) * pageSize;
-            const take = pageSize;
-            const total = await prismaTransaction.tbcidade.count();
-            const response = await prismaTransaction.tbcidade.findMany({
-                skip: skip,
-                take: take,
-                orderBy: { nome: 'asc' },
-                include: { estado: true }
-            });
+        const skip = (page - 1) * pageSize;
+        const take = pageSize;
+        const total = await prisma.tbcidade.count();
+        const response = await prisma.tbcidade.findMany({
+            skip: skip,
+            take: take,
+            orderBy: { nome: 'asc' },
+            include: { estado: true }
+        });
+        if(response){
             const reqcidadeDTO: reqCidadeDTO[] = response.map((c) => {
                 return {
                     id: c.id,
@@ -85,64 +91,50 @@ async function selectCidade(prisma: PrismaClient, page: number = 1, pageSize: nu
                     }
                 };
             });
-            return {
-                data: reqcidadeDTO,
-                total: total,
-                page: page,
-                pageSize: pageSize
-            };
-        });
-        return result;
+            return { data: reqcidadeDTO, total: total, page: page, pageSize: pageSize };
+        };
+        return  { data: [], total: 0, page: page, pageSize: pageSize };
     } catch (error) {
         if (error instanceof Error) {
             const tratamento = await tratamentoError(error);
-            return  {
-                data: [],
-                total: 0,
-                page: page,
-                pageSize: pageSize
-            };
+            return  { data: [], total: 0, page: page, pageSize: pageSize };
         }
-        return  {
-            data: [],
-            total: 0,
-            page: page,
-            pageSize: pageSize
-        };
+        return  {  data: [], total: 0, page: page, pageSize: pageSize };
+    } finally {
+        await prisma.$disconnect();
     };
 };
 
 async function selectCidadeId(prisma: PrismaClient, id: number): Promise<reqCidadeDTO | null> {
     try {
-        const result = await prisma.$transaction(async (prismaTransaction) => {
-            const response = await prismaTransaction.tbcidade.findUnique({
-                where: { id: id },
-                include: { estado: true }
-            });
-            if(response){
-                const reqcidadeDTO: reqCidadeDTO = {
-                    id: response.id,
-                    nome: response.nome,
-                    estadoid: response.estadoid,
-                    codigoibge: response.codigoibge,
-                    estado: {
-                        id: response.estado.id,
-                        nome: response.estado.nome,
-                        uf: response.estado.uf,
-                        pais: response.estado.pais
-                    }
-                };
-                return reqcidadeDTO;
-            };
-            return null;
+        const response = await prisma.tbcidade.findUnique({
+            where: { id: id },
+            include: { estado: true }
         });
-        return result;
+        if(response){
+            const reqcidadeDTO: reqCidadeDTO = {
+                id: response.id,
+                nome: response.nome,
+                estadoid: response.estadoid,
+                codigoibge: response.codigoibge,
+                estado: {
+                    id: response.estado.id,
+                    nome: response.estado.nome,
+                    uf: response.estado.uf,
+                    pais: response.estado.pais
+                }
+            };
+            return reqcidadeDTO;
+        };
+        return null;
     } catch (error) {
         if (error instanceof Error) {
             const tratamento = await tratamentoError(error);
             return null;
         }
         return null;
+    } finally {
+        await prisma.$disconnect();
     };
 };
 

@@ -4,7 +4,7 @@ const router = express.Router();
 import { tratamentoError } from '../messaging/Excepitions';
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
-import { createCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
+import { createCliente, deleteCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
 
 dotenv.config();
 
@@ -106,6 +106,21 @@ router.put('/Cliente', async (req: Request, res: Response) => {
         const cliente = req.body;
         const atualizaCliente = await updateCliente(req.prisma, cliente, parseInt(id));
         return res.status(atualizaCliente.status).json({msg: atualizaCliente.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
+});
+
+//rota para deletar o cliente selecionado
+router.delete('/Cliente', async (req: Request, res: Response) => {
+    try {
+        const id = req.query.id as string;
+        const cliente = await deleteCliente(req.prisma, parseInt(id));
+        return res.status(cliente.status).json(cliente.msg);
     } catch (error) {
         if (error instanceof Error) {
             const tratamento = await tratamentoError(error);

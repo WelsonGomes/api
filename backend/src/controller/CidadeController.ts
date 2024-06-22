@@ -33,10 +33,10 @@ async function deleteCidade(prisma: PrismaClient, id: number): Promise<{status: 
         if(response){
             return {status: 200, msg: 'Cidade deletada com sucesso.'};
         }
-        return {status: 500, msg: 'Houve um erro ao deletar a cidade.'};
+        return {status: 400, msg: 'Houve um erro ao deletar a cidade.'};
     } catch (error) {
         console.log(error);
-        return {status: 500, msg: error instanceof Error ? error.message : 'Erro desconhecido.'};
+        return {status: 400, msg: error instanceof Error ? error.message : 'Erro desconhecido.'};
     }
 };
 

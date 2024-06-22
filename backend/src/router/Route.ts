@@ -4,7 +4,7 @@ const router = express.Router();
 import { tratamentoError } from '../messaging/Excepitions';
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
-import { createCliente, selectCliente, updateCliente } from '../controller/ClienteController';
+import { createCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
 
 dotenv.config();
 
@@ -84,24 +84,50 @@ router.get('/Cidade/:id', async (req: Request, res: Response) => {
     return res.status(200).json({msg: 'Não foi encontrado esta cidade.'});
 });
 
-//rotas do objeto de cliente
+//rota para cadastrar um cliente
 router.post('/Cliente', async (req: Request, res: Response) => {
-    const cliente = req.body;
-    const novoCliente = await createCliente(req.prisma, cliente);
-    return res.status(novoCliente.status).json({msg: novoCliente.msg});
+    try {
+        const cliente = req.body;
+        const novoCliente = await createCliente(req.prisma, cliente);
+        return res.status(novoCliente.status).json({msg: novoCliente.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
 });
 
-router.put('/Cliente/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const cliente = req.body;
-    const atualizaCliente = await updateCliente(req.prisma, cliente, parseInt(id));
-    return res.status(atualizaCliente.status).json({msg: atualizaCliente.msg});
+//rota para atualizar os dados de um cliente
+router.put('/Cliente', async (req: Request, res: Response) => {
+    try {
+        const id = req.query.id as string;
+        const cliente = req.body;
+        const atualizaCliente = await updateCliente(req.prisma, cliente, parseInt(id));
+        return res.status(atualizaCliente.status).json({msg: atualizaCliente.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
 });
 
+//rota para buscar todos os clientes ou com o filtro do id do cliente
 router.get('/Cliente', async (req: Request, res: Response) => {
     try {
+        const id = req.query.id as string;
         const page = req.query.page as string;
         const pageSize = req.query.pageSize as string;
+        if(parseInt(id) > 0){
+            const cliente = await selectClienteId(req.prisma,parseInt(id));
+            if(cliente){
+                return res.status(200).json(cliente);
+            }
+            return res.status(200).json({msg: 'Nenhuma informação para exibir.'});
+        }
         const clientes = await selectCliente(req.prisma, parseInt(page), parseInt(pageSize));
         if(clientes.data.length > 0){
             return res.status(200).json(clientes);
@@ -113,7 +139,7 @@ router.get('/Cliente', async (req: Request, res: Response) => {
             return res.status(tratamento.status).json(tratamento.msg);
         }
         return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
-    }
+    };
 });
 
 module.exports = router;

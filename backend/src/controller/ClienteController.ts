@@ -33,7 +33,7 @@ async function createCliente(prisma: PrismaClient, cliente: ClienteDTO): Promise
                     numero: cliente.numero,
                     bairro: cliente.bairro,
                     complemento: cliente.complemento,
-                    datacadastro: new Date(cliente.datacadastro)
+                    datacadastro: new Date()
                 }
             });
             return { status: 200, msg: 'Novo cliente cadastrado com sucesso.' };
@@ -83,8 +83,7 @@ async function updateCliente(prisma: PrismaClient, cliente: ClienteDTO, id: numb
                     logradouro: cliente.logradouro,
                     numero: cliente.numero,
                     bairro: cliente.bairro,
-                    complemento: cliente.complemento,
-                    datacadastro: new Date(cliente.datacadastro)
+                    complemento: cliente.complemento
                 }
             });
 

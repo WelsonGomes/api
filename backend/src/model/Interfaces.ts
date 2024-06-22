@@ -56,26 +56,25 @@ export interface ClienteDTO {
     datacadastro: string;
 }
 
-export interface ClienteDTO {
+export interface reqClienteDTO {
     id: number;
     cnpjcpf: string;
     razaosocial: string;
-    fantasia?: string;
-    datacriacao: string;
+    fantasia?: string | null;
+    datacriacao: Date;
     contratoid: number;
-    responsavel?: string;
+    responsavel?: string | null;
     situacao: number; 
     email: string;
-    telefone?: string;
-    celular?: string;
+    telefone?: string | null;
+    celular?: string | null;
     estadoid: number;
     cidadeid: number;
-    cep?: string;
-    logradouro?: string;
-    numero?: number;
-    bairro?: string;
-    complemento?: string;
-    datacadastro: string;
-    estado: reqEstadoDTO;
+    cep?: string | null;
+    logradouro?: string | null;
+    numero?: number | null;
+    bairro?: string | null;
+    complemento?: string | null;
+    datacadastro: Date;
     cidade: reqCidadeDTO;
 }

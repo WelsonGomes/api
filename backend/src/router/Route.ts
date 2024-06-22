@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 const router = express.Router();
+import { tratamentoError } from '../messaging/Excepitions';
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
-import { createCliente, updateCliente } from '../controller/ClienteController';
+import { createCliente, selectCliente, updateCliente } from '../controller/ClienteController';
 
 dotenv.config();
 
@@ -95,6 +96,24 @@ router.put('/Cliente/:id', async (req: Request, res: Response) => {
     const cliente = req.body;
     const atualizaCliente = await updateCliente(req.prisma, cliente, parseInt(id));
     return res.status(atualizaCliente.status).json({msg: atualizaCliente.msg});
+});
+
+router.get('/Cliente', async (req: Request, res: Response) => {
+    try {
+        const page = req.query.page as string;
+        const pageSize = req.query.pageSize as string;
+        const clientes = await selectCliente(req.prisma, parseInt(page), parseInt(pageSize));
+        if(clientes.data.length > 0){
+            return res.status(200).json(clientes);
+        }
+        return res.status(200).json({msg: 'Nenhuma informação para exibir.'});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    }
 });
 
 module.exports = router;

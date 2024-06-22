@@ -48,7 +48,7 @@ async function deleteEstado(prisma: PrismaClient, id: number): Promise<{status: 
     };
 };
 
-async function selectEstado(prisma: PrismaClient, ): Promise<reqEstadoDTO[]> {
+async function selectEstado(prisma: PrismaClient ): Promise<reqEstadoDTO[]> {
     const estados = await prisma.tbestado.findMany({orderBy: [{ id: 'asc' }]});
     const reqestadosDTO: reqEstadoDTO[] = estados.map((e) => {
         return {

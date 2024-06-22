@@ -34,7 +34,6 @@ model tbcliente {
   razaosocial String @db.VarChar(200)
   fantasia String? @db.VarChar(200)
   datacriacao DateTime
-  contratoid Int
   responsavel String? @db.VarChar(100)
   situacao Int 
   email String @db.VarChar(100)
@@ -50,4 +49,25 @@ model tbcliente {
   bairro String? @db.VarChar(100)
   complemento String? @db.VarChar(100)
   datacadastro DateTime @default(now())
+  contrato tbcontrato[]
+}
+
+model tbcontrato {
+  id Int @id @default(autoincrement())
+  contrato Int @unique
+  clienteid Int
+  cliente tbcliente @relation(fields: [clienteid],references: [id])
+  dtinicio DateTime
+  qtdmeses Int
+  dttermino DateTime
+  valor Decimal @db.Decimal(17,2)
+  valormensal Decimal @db.Decimal(17,2)
+  responsavel String @db.VarChar(100)
+  dtcadastro DateTime @default(now())
+  cedente String
+  cessionaria String
+  descricao String
+  status Int
+  dtassinatura DateTime
+  dtatualizacao DateTime
 }

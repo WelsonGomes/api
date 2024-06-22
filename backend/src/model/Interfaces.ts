@@ -40,7 +40,6 @@ export interface ClienteDTO {
     razaosocial: string;
     fantasia?: string;
     datacriacao: string;
-    contratoid: number;
     responsavel?: string;
     situacao: number; 
     email: string;
@@ -62,7 +61,6 @@ export interface reqClienteDTO {
     razaosocial: string;
     fantasia?: string | null;
     datacriacao: Date;
-    contratoid: number;
     responsavel?: string | null;
     situacao: number; 
     email: string;

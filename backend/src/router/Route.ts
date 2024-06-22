@@ -5,6 +5,7 @@ import { tratamentoError } from '../messaging/Excepitions';
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
 import { createCliente, deleteCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
+import { CidadeDTO, PaginatedResponse, reqCidadeDTO } from '../model/Interfaces';
 
 dotenv.config();
 
@@ -47,42 +48,75 @@ router.get('/Estado/:id', async (req: Request, res: Response) => {
 
 //rotas do objeto de cidade
 router.post('/Cidade', async (req: Request, res: Response) => {
-    const cidadeDTO = req.body;
-    const novaCidade = await createCidade(req.prisma,cidadeDTO);
-    return res.status(novaCidade.status).json({msg: novaCidade.msg});
+    try {
+        const cidadeDTO = req.body;
+        const novaCidade = await createCidade(req.prisma,cidadeDTO);
+        return res.status(novaCidade.status).json({msg: novaCidade.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
 });
 
-router.put('/Cidade/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const cidadeDTO = req.body;
-    const atualizaCidade = await updateCidade(req.prisma,cidadeDTO, parseInt(id));
-    return res.status(atualizaCidade.status).json({msg: atualizaCidade.msg});
+router.put('/Cidade', async (req: Request, res: Response) => {
+    try {
+        const id = req.query.id as string;
+        const cidadeDTO = req.body;
+        const atualizaCidade = await updateCidade(req.prisma,cidadeDTO, parseInt(id));
+        return res.status(atualizaCidade.status).json({msg: atualizaCidade.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
 });
 
-router.delete('/Cidade/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const deletarCidade = await deleteCidade(req.prisma,parseInt(id));
-    return res.status(deletarCidade.status).json({msg: deletarCidade.msg});
+router.delete('/Cidade', async (req: Request, res: Response) => {
+    try {
+        const id = req.query.id as string;
+        const deletarCidade = await deleteCidade(req.prisma,parseInt(id));
+        return res.status(deletarCidade.status).json({msg: deletarCidade.msg});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
 });
 
-router.get('/Cidade/:page/:pageSize', async (req: Request, res: Response) => {
-    const page = req.params.page;
-    const pageSize = req.params.pageSize;
-    const cidades = await selectCidade(req.prisma,parseInt(page),parseInt(pageSize));
-    if(cidades.data.length > 0){
-        return res.status(200).json(cidades);
-    }
-    return res.status(200).json({msg: 'Nenhum registro para mostrar.'});
+//rota para selecionar todas as cidades ou a especificada no filtro
+router.get('/Cidade', async (req: Request, res: Response) => {
+    try {
+        const id = req.query.id as string;
+        const page = req.query.page as string;
+        const pageSize = req.query.pageSize as string;
+        let cidades;
+        if(parseInt(id) > 0){
+            cidades = await selectCidadeId(req.prisma, parseInt(id));
+        } else {
+            cidades = await selectCidade(req.prisma,parseInt(page), parseInt(pageSize));
+        }
+        if(cidades) {
+            return res.status(200).json(cidades);
+        }
+        return res.status(200).json({msg: 'Não foi possivel localizar a(s) cidade(s).'});
+    } catch (error) {
+        if (error instanceof Error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        }
+        return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
 });
 
-router.get('/Cidade/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const cidade = await selectCidadeId(req.prisma,parseInt(id));
-    if(cidade){
-        return res.status(200).json(cidade);
-    }
-    return res.status(200).json({msg: 'Não foi encontrado esta cidade.'});
-});
+
+
 
 //rota para cadastrar um cliente
 router.post('/Cliente', async (req: Request, res: Response) => {
@@ -120,7 +154,7 @@ router.delete('/Cliente', async (req: Request, res: Response) => {
     try {
         const id = req.query.id as string;
         const cliente = await deleteCliente(req.prisma, parseInt(id));
-        return res.status(cliente.status).json(cliente.msg);
+        return res.status(cliente.status).json({msg: cliente.msg});
     } catch (error) {
         if (error instanceof Error) {
             const tratamento = await tratamentoError(error);

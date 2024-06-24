@@ -1,6 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
 import { getPrismaClient } from './connec/Conn';
 dotenv.config();
 

@@ -94,7 +94,7 @@ export interface ContratoDTO {
     descricao: string;
     status: number;
     dtassinatura: Date;
-    dtatualizacao: Date;
+    dtatualizacao?: Date;
 }
 
 export interface reqContratoDTO {
@@ -113,6 +113,6 @@ export interface reqContratoDTO {
     descricao: string;
     status: number;
     dtassinatura: Date;
-    dtatualizacao: Date;
+    dtatualizacao?: Date;
     cliente: reqClienteDTO;
 }

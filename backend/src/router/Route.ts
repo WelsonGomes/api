@@ -5,6 +5,7 @@ import { tratamentoError } from '../messaging/Excepitions';
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
 import { createCliente, deleteCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
+import { createContrato } from '../controller/ContratoController';
 
 dotenv.config();
 
@@ -224,6 +225,22 @@ router.get('/Cliente', async (req: Request, res: Response) => {
             return res.status(tratamento.status).json(tratamento.msg);
         }
         return res.status(500).json({msg: 'Houve uma falha crítica no servidor.'});
+    };
+});
+
+/************************ROTAS DO OBJETO CONTRATO**************************/
+
+//rota para cadastrar um novo contrato
+router.post('/Contrato', async (req: Request, res: Response) => {
+    try {
+        const response = await createContrato(req.prisma, req.body);
+        return res.status(response.status).json(response.msg);
+    } catch (error) {
+        if(error instanceof Error){
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json(tratamento.msg);
+        };
+        return res.status(500).json({msg: 'Houve uma falha crítica no sistema. Por favor, contate um especialista.'});
     };
 });
 

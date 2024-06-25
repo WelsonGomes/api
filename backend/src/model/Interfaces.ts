@@ -1,3 +1,5 @@
+import { Decimal } from "@prisma/client/runtime/library";
+
 //Interface de dados do objeto de estado
 export interface EstadoDTO {
     nome: string;
@@ -75,4 +77,42 @@ export interface reqClienteDTO {
     complemento?: string | null;
     datacadastro: Date;
     cidade: reqCidadeDTO;
+}
+
+export interface ContratoDTO {
+    contrato: number;
+    clienteid: number;
+    dtinicio: Date;
+    qtdmeses: number;
+    dttermino: Date;
+    valor: Decimal;
+    valormensal: Decimal;
+    responsavel: string;
+    dtcadastro: Date;
+    cedente: string;
+    cessionaria: string;
+    descricao: string;
+    status: number;
+    dtassinatura: Date;
+    dtatualizacao: Date;
+}
+
+export interface reqContratoDTO {
+    id: number;
+    contrato: number;
+    clienteid: number;
+    dtinicio: Date;
+    qtdmeses: number;
+    dttermino: Date;
+    valor: Decimal;
+    valormensal: Decimal;
+    responsavel: string;
+    dtcadastro: Date;
+    cedente: string;
+    cessionaria: string;
+    descricao: string;
+    status: number;
+    dtassinatura: Date;
+    dtatualizacao: Date;
+    cliente: reqClienteDTO;
 }

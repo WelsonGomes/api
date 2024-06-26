@@ -8,7 +8,7 @@ dotenv.config();
 async function createCidade(prisma: PrismaClient, cidade: CidadeDTO): Promise<{status: number, msg: string}> {
     try {
         const result = await prisma.$transaction(async (prismaTransaction) => {
-            await prisma.tbcidade.create({data: cidade});
+            await prismaTransaction.tbcidade.create({data: cidade});
             return {status: 200, msg: 'Nova cidade cadastrada com sucesso.'};
         });
         return result;

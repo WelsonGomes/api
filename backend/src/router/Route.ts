@@ -8,7 +8,7 @@ import { createCliente, deleteCliente, selectCliente, selectClienteId, updateCli
 
 dotenv.config();
 
-/************************ROTAS DO OBJETO CLIENTE**************************/
+/************************ROTAS DO OBJETO ESTADO**************************/
 
 //rota para cadastrar um novo estado
 router.post('/Estado', async (req: Request, res: Response) => {

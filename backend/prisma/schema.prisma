@@ -8,6 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// MODELOS DAS TABELAS DE USO PRINCIPAL DE GERENCIAMENTO
 model tbestado {
   id Int @id @default(autoincrement())
   nome String @db.VarChar(100) @unique
@@ -15,6 +16,7 @@ model tbestado {
   pais String @db.VarChar(100)
   cidade tbcidade[]
   cliente tbcliente[]
+  endereco tbendereco[]
 }
 
 model tbcidade {
@@ -24,6 +26,7 @@ model tbcidade {
   estado tbestado @relation(fields: [estadoid], references: [id])
   codigoibge Int
   cidade tbcliente[]
+  endereco tbendereco[]
 
   @@unique([nome, estadoid])
 }
@@ -70,4 +73,67 @@ model tbcontrato {
   status Int
   dtassinatura DateTime
   dtatualizacao DateTime?
+}
+
+//MODELOS DAS TABELAS REFERENTE AS PESSOAS
+
+model tbtipofisico {
+  id Int @id @default(autoincrement())
+  descricao String @db.VarChar(50)
+  pessoa tbpessoa[]
+}
+
+model tbnivelatividade {
+  id Int @id @default(autoincrement())
+  descricao String @db.VarChar(50)
+  pessoa tbpessoa[]
+}
+
+model tbobjetivo {
+  id Int @id @default(autoincrement())
+  descricao String @db.VarChar(50)
+  pessoa tbpessoa[]
+}
+
+model tbcontato {
+  id Int @id @default(autoincrement())
+  pessoaid Int
+  pessoa tbpessoa @relation(fields: [pessoaid], references: [id])
+  telefone String @db.VarChar(10)
+  celular String @db.VarChar(11)
+  email String @db.VarChar(100) @unique
+}
+
+model tbendereco {
+  id Int @id @default(autoincrement())
+  pessoaid Int
+  pessoa tbpessoa @relation(fields: [pessoaid], references: [id])
+  cep String @db.VarChar(8)
+  rua String
+  numero String?
+  cidadeid Int
+  cidade tbcidade @relation(fields: [cidadeid], references: [id])
+  bairro String
+  estadoid Int
+  estado tbestado @relation(fields: [estadoid], references: [id])
+  complemento String
+}
+
+model tbpessoa {
+  id Int @id @default(autoincrement())
+  codigo Int
+  nome String @db.VarChar(50)
+  sobrenome String @db.VarChar(50)
+  cpf String @db.VarChar(11) @unique
+  datanascimento DateTime
+  sexo Int
+  tipofisicoid Int
+  tipofisico tbtipofisico @relation(fields: [tipofisicoid], references: [id])
+  nivelatividadeid Int
+  nivelatividade tbnivelatividade @relation(fields: [nivelatividadeid], references: [id])
+  objetivoid Int
+  objetivo tbobjetivo @relation(fields: [objetivoid], references: [id])
+  situacao Int 
+  contato tbcontato[]
+  endereco tbendereco[]
 }

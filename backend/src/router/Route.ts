@@ -9,7 +9,7 @@ import { createContrato } from '../controller/ContratoController';
 
 dotenv.config();
 
-/************************ROTAS DO OBJETO CLIENTE**************************/
+/************************ROTAS DO OBJETO ESTADO**************************/
 
 //rota para cadastrar um novo estado
 router.post('/Estado', async (req: Request, res: Response) => {
@@ -228,6 +228,7 @@ router.get('/Cliente', async (req: Request, res: Response) => {
     };
 });
 
+<<<<<<< HEAD
 /************************ROTAS DO OBJETO CONTRATO**************************/
 
 //rota para cadastrar um novo contrato
@@ -245,3 +246,6 @@ router.post('/Contrato', async (req: Request, res: Response) => {
 });
 
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> e67f20ea4b3cd4623e2d94252f390ea0f13fccf1

@@ -76,7 +76,7 @@ export interface reqClienteDTO {
     bairro?: string | null;
     complemento?: string | null;
     datacadastro: Date;
-    cidade: reqCidadeDTO;
+    cidade: reqCidadeDTO | null;
 }
 
 export interface ContratoDTO {
@@ -113,6 +113,6 @@ export interface reqContratoDTO {
     descricao: string;
     status: number;
     dtassinatura: Date;
-    dtatualizacao?: Date;
+    dtatualizacao?: Date | null;
     cliente: reqClienteDTO;
 }

@@ -234,6 +234,10 @@ router.post('/Contrato', ContratoController.createContrato);
 
 router.put('/Contrato', ContratoController.updateContrato);
 
+router.delete('/Contrato', ContratoController.deleteContrato);
+
+router.get('/Contrato', ContratoController.selectContrato);
+
 
 
 module.exports = router;

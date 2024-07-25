@@ -58,11 +58,6 @@ async function updateCliente(prisma: PrismaClient, cliente: ClienteDTO, id: numb
         }
 
         const response = await prisma.$transaction(async (prismaTransaction) => {
-            const existingCliente = await prismaTransaction.tbcliente.findUnique({ where: { id: id } });
-            if (!existingCliente) {
-                return { status: 400, msg: 'Este cliente não foi encontrado. Por favor verifique.' };
-            }
-
             await prismaTransaction.tbcliente.update({
                 where: { id: id },
                 data: {
@@ -90,11 +85,8 @@ async function updateCliente(prisma: PrismaClient, cliente: ClienteDTO, id: numb
 
         return response;
     } catch (error) {
-        if (error instanceof Error) {
-            const tratamento = await tratamentoError(error);
-            return { status: tratamento.status, msg: tratamento.msg };
-        }
-        return { status: 500, msg: 'Houve um erro crítico no sistema' };
+        const tratamento = await tratamentoError(error);
+        return tratamento;
     } finally {
         await prisma.$disconnect();
     }
@@ -103,21 +95,18 @@ async function updateCliente(prisma: PrismaClient, cliente: ClienteDTO, id: numb
 async function deleteCliente(prisma: PrismaClient, id: number): Promise<{status: number, msg: string}> {
     try {
         const result = await prisma.$transaction(async (prismaTransaction) => {
-            const cliente = await prismaTransaction.tbcliente.findUnique({ where: { id: id } });
-            if (cliente) {
+            //const cliente = await prismaTransaction.tbcliente.findUnique({ where: { id: id } });
+            //if (cliente) {
                 await prismaTransaction.tbcliente.delete({ where: { id: id }}); 
                 return { status: 200, msg: 'Cliente deletado com sucesso.' };
-            } else {
-                return { status: 400, msg: 'Não foi possível encontrar o cliente.' };
-            }
+            //} else {
+            //    return { status: 400, msg: 'Não foi possível encontrar o cliente.' };
+            //}
         });
         return result;
     } catch (error) {
-        if (error instanceof Error) {
-            const tratamento = await tratamentoError(error);
-            return { status: tratamento.status, msg: tratamento.msg };
-        }
-        return { status: 500, msg: 'Houve um erro crítico no sistema' };
+        const tratamento = await tratamentoError(error);
+        return tratamento;
     } finally {
         await prisma.$disconnect();
     };
@@ -173,10 +162,6 @@ async function selectCliente(prisma: PrismaClient, page: number = 1, pageSize: n
         }
         return  { data: [], total: 0, page: page, pageSize: pageSize }; 
     } catch (error) {
-        if (error instanceof Error) {
-            const tratamento = await tratamentoError(error);
-            return  { data: [], total: 0, page: page, pageSize: pageSize }; 
-        }
         return  { data: [], total: 0, page: page, pageSize: pageSize }; 
     } finally {
         await prisma.$disconnect();
@@ -226,10 +211,6 @@ async function selectClienteId(prisma: PrismaClient, id: number): Promise<reqCli
         }
         return cliente;
     } catch (error) {
-        if (error instanceof Error) {
-            const tratamento = await tratamentoError(error);
-            return null;
-        }
         return null;
     } finally {
         await prisma.$disconnect();

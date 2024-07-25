@@ -8,22 +8,31 @@ dotenv.config();
 export default class ContratoController {
     static async createContrato(req: Request, res: Response) {
         try {
-            const result = await req.prisma.$transaction(async (prismaTransaction) => {
-                const contrato = req.body;
-                contrato.dtinicio = new Date(contrato.dtinicio);
-                contrato.dttermino = new Date(contrato.dttermino);
-                contrato.dtcadastro = new Date(contrato.dtcadastro);
-                contrato.dtassinatura = new Date(contrato.dtassinatura);
-                await prismaTransaction.tbcontrato.create({ data: contrato });
-                return res.status(200).json({msg: 'Novo contrato cadastrado com sucesso.'});
+            await req.prisma.$transaction(async (prismaTransaction) => {
+                return prismaTransaction.tbcontrato.create({ 
+                    data: {
+                        contrato: req.body.contrato,
+                        clienteid: req.body.clienteid,
+                        dtinicio: new Date(req.body.dtinicio),
+                        qtdmeses: req.body.qtdmeses,
+                        dttermino: new Date(req.body.dttermino),
+                        valor: req.body.valor,
+                        valormensal: req.body.valormensal,
+                        responsavel: req.body.responsavel,
+                        dtcadastro: new Date(req.body.dtcadastro),
+                        cedente: req.body.cedente,
+                        cessionaria: req.body.cessionaria,
+                        descricao: req.body.descricao,
+                        status: req.body.status,
+                        dtassinatura: new Date(req.body.dtassinatura)
+                    }
+                });
+                
             });
-            return result;
+            return res.status(200).json({msg: 'Novo contrato cadastrado com sucesso.'});
         } catch (error) {
-            if(error instanceof Error){
-                const tratamento = await tratamentoError(error);
-                return res.status(tratamento.status).json({msg: tratamento.msg});
-            };
-            return res.status(500).json({msg: 'Houve uma falha crítica no sistema. Por favor, entre em contato com um especialista.'});
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg});
         } finally {
             await req.prisma.$disconnect();
         };
@@ -31,25 +40,33 @@ export default class ContratoController {
 
     static async updateContrato(req:Request, res: Response) {
         try {
-            const result = req.prisma.$transaction(async (prismaTransaction) => {
-                const contrato = req.body;
-                contrato.dtinicio = new Date(contrato.dtinicio);
-                contrato.dttermino = new Date(contrato.dttermino);
-                contrato.dtcadastro = new Date(contrato.dtcadastro);
-                contrato.dtassinatura = new Date(contrato.dtassinatura);
-                if(contrato.dtatualizacao){
-                    contrato.dtatualizacao = new Date(contrato.dtatualizacao);
-                };
-                await prismaTransaction.tbcontrato.update({ where: { id: parseInt(req.query.id as string) }, data: contrato });
-                return res.status(200).json({msg: 'Contrato alterado com sucesso.'});
+            await req.prisma.$transaction(async (prismaTransaction) => {
+                return prismaTransaction.tbcontrato.update({ 
+                    where: { 
+                        id: parseInt(req.query.id as string) 
+                    }, 
+                    data: {
+                        contrato: req.body.contrato,
+                        clienteid: req.body.clienteid,
+                        dtinicio: new Date(req.body.dtinicio),
+                        qtdmeses: req.body.qtdmeses,
+                        dttermino: new Date(req.body.dttermino),
+                        valor: req.body.valor,
+                        valormensal: req.body.valormensal,
+                        responsavel: req.body.responsavel,
+                        dtcadastro: new Date(req.body.dtcadastro),
+                        cedente: req.body.cedente,
+                        cessionaria: req.body.cessionaria,
+                        descricao: req.body.descricao,
+                        status: req.body.status,
+                        dtassinatura: new Date(req.body.dtassinatura)
+                    }
+                });
             });
-            return result;
+            return res.status(200).json({msg: 'Contrato alterado com sucesso.'});
         } catch (error) {
-            if(error instanceof Error){
-                const tratamento = await tratamentoError(error);
-                return res.status(tratamento.status).json({msg: tratamento.msg});
-            };
-            return res.status(500).json({msg: 'Houve uma falha crítica no sistema. Por favor, entre em contato com um especialista.'});
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg});
         } finally {
             await req.prisma.$disconnect();
         };
@@ -57,17 +74,16 @@ export default class ContratoController {
 
     static async deleteContrato(req: Request, res: Response) {
         try {
-            const result = await req.prisma.$transaction(async (prismaTransaction) => {
-                await prismaTransaction.tbcontrato.update({ where: { id: parseInt(req.query.id as string) }, data: { status: 0 }});
-                return res.status(200).json({msg: 'Contrado deletado com sucesso.'});
+            await req.prisma.$transaction(async (prismaTransaction) => {
+                return prismaTransaction.tbcontrato.update({ 
+                    where: { id: parseInt(req.query.id as string) }, 
+                    data: { status: 0 }
+                });
             });
-            return result;
+            return res.status(200).json({msg: 'Contrado deletado com sucesso.'});
         } catch (error) {
-            if(error instanceof Error){
-                const tratamento = await tratamentoError(error);
-                return res.status(tratamento.status).json({msg: tratamento.msg});
-            };
-            return res.status(500).json({msg: 'Houve uma falha crítica no sistema. Por favor, entre em contato com um especialista.'});
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg});
         } finally {
             await req.prisma.$disconnect();
         };
@@ -150,11 +166,8 @@ export default class ContratoController {
             });
             return res.status(200).json({total: total, page: req.query.page as string, pageSize: req.query.pageSize as string, data: result});
         } catch (error) {
-            if(error instanceof Error){
-                const tratamento = await tratamentoError(error);
-                return res.status(tratamento.status).json({msg: tratamento.msg});
-            };
-            return res.status(500).json({msg: 'Houve uma falha crítica no sistema. Por favor, entre em contato com um especialista.'});
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg});
         } finally {
             await req.prisma.$disconnect();
         };

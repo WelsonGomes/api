@@ -31,7 +31,7 @@ if (messageMatch) {
     };
 };
 
-async function tratamentoError(error: Error): Promise<{status: number, msg: string}> {
+async function tratamentoError(error: any): Promise<{status: number, msg: string}> {
     const response = extractErrorDetails(error.message);
     if(error instanceof Prisma.PrismaClientKnownRequestError){
         switch (error.code){
@@ -45,6 +45,11 @@ async function tratamentoError(error: Error): Promise<{status: number, msg: stri
                 const detail = meta?.detail;
                 return { status: 400, msg: `O valor sendo inserido no campo viola as restrições da tabela. Detalhes: ${detail}` };
             };
+            case 'P2025':{
+                const meta = error.meta;
+                const detail = meta?.detail;
+                return { status: 400, msg: `Este registro não existe na base de dados. Detalhes: ${detail}` };
+            }
         };
         return {status: 500, msg: `Erro no servidor: ${error.message}`};
     } else if(error instanceof Prisma.PrismaClientInitializationError){

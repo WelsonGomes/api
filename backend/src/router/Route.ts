@@ -6,6 +6,9 @@ import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado 
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
 import { createCliente, deleteCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
 import ContratoController from '../controller/ContratoController';
+import TipoFisicoController from '../controller/TipoFisicoController';
+import NivelAtividadeController from '../controller/NivelAtividadeController';
+import ObjetivoController from '../controller/ObjetivoController';
 
 dotenv.config();
 
@@ -238,6 +241,34 @@ router.delete('/Contrato', ContratoController.deleteContrato);
 
 router.get('/Contrato', ContratoController.selectContrato);
 
+/************************ROTAS DO OBJETO TIPO FISICO**************************/
 
+router.post('/Tipofisico', TipoFisicoController.createTipofisico);
+
+router.put('/Tipofisico', TipoFisicoController.updateTipofisico);
+
+router.delete('/Tipofisico', TipoFisicoController.deleteTipofisico);
+
+router.get('/Tipofisico', TipoFisicoController.selectTipofisico);
+
+/************************ROTAS DO OBJETO NIVEL ATIVIDADE**************************/
+
+router.post('/Nivelatividade', NivelAtividadeController.createNivelatividade);
+
+router.put('/Nivelatividade', NivelAtividadeController.updateNivelatividade);
+
+router.delete('/Nivelatividade', NivelAtividadeController.deleteNivelatividade);
+
+router.get('/Nivelatividade', NivelAtividadeController.selectNivelatividade);
+
+/************************ROTAS DO OBJETO OBJETIVO**************************/
+
+router.post('/Objetivo', ObjetivoController.createObjetivo);
+
+router.put('/Objetivo', ObjetivoController.updateObjetivo);
+
+router.delete('/Objetivo', ObjetivoController.deleteObjetivo);
+
+router.get('/Objetivo', ObjetivoController.selectObjetivo);
 
 module.exports = router;

@@ -94,7 +94,7 @@ export interface ContratoDTO {
     descricao: string;
     status: number;
     dtassinatura: Date;
-    dtatualizacao?: Date;
+    dtatualizacao?: Date | null;
 }
 
 export interface reqContratoDTO {

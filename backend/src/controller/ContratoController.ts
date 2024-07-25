@@ -9,7 +9,12 @@ export default class ContratoController {
     static async createContrato(req: Request, res: Response) {
         try {
             const result = await req.prisma.$transaction(async (prismaTransaction) => {
-                await prismaTransaction.tbcontato.create({ data: req.body });
+                const contrato = req.body;
+                contrato.dtinicio = new Date(contrato.dtinicio);
+                contrato.dttermino = new Date(contrato.dttermino);
+                contrato.dtcadastro = new Date(contrato.dtcadastro);
+                contrato.dtassinatura = new Date(contrato.dtassinatura);
+                await prismaTransaction.tbcontrato.create({ data: contrato });
                 return res.status(200).json({msg: 'Novo contrato cadastrado com sucesso.'});
             });
             return result;
@@ -27,7 +32,15 @@ export default class ContratoController {
     static async updateContrato(req:Request, res: Response) {
         try {
             const result = req.prisma.$transaction(async (prismaTransaction) => {
-                await prismaTransaction.tbcontrato.update({ where: { id: parseInt(req.query.id as string) }, data: req.body });
+                const contrato = req.body;
+                contrato.dtinicio = new Date(contrato.dtinicio);
+                contrato.dttermino = new Date(contrato.dttermino);
+                contrato.dtcadastro = new Date(contrato.dtcadastro);
+                contrato.dtassinatura = new Date(contrato.dtassinatura);
+                if(contrato.dtatualizacao){
+                    contrato.dtatualizacao = new Date(contrato.dtatualizacao);
+                };
+                await prismaTransaction.tbcontrato.update({ where: { id: parseInt(req.query.id as string) }, data: contrato });
                 return res.status(200).json({msg: 'Contrato alterado com sucesso.'});
             });
             return result;
@@ -62,19 +75,26 @@ export default class ContratoController {
 
     static async selectContrato(req: Request, res: Response) {
         try {
-            if(parseInt(req.query.id as string) > 0) {
+            let id = parseInt(req.query.id as string,10);
+
+            if(id > 0) {
                 const response = await req.prisma.tbcontrato.findUnique({ where: { id: parseInt(req.query.id as string) }});
-                return res.status(200).json(response);
+                return res.status(200).json({ page: req.query.page as string, pageSize: req.query.pageSize as string, data: response });
             };
-            const total = await req.prisma.tbcontrato.count();
+
+            let skip = parseInt(req.query.page as string,10);
+            let take = parseInt(req.query.pageSize as string,10);
+            const total = await req.prisma.tbcontrato.count({ where: { status: 1 }});
+            skip = (skip - 1) * take;
             const response = await req.prisma.tbcontrato.findMany({
-                skip: parseInt(req.query.skip as string),
-                take: parseInt(req.query.take as string),
+                where: {status: 1 },
+                skip: skip,
+                take: take,
                 orderBy: { dtinicio: 'asc' },
-                include: { cliente: true }
+                include: { cliente: { include: { cidade: {include: { estado: true } } } } }
             });
-            if(!response){
-                return res.status(200).json({data: [], total: 0, page: req.query.page as string, pageSize: req.query.pageSize as string});
+            if(!response.length){
+                return res.status(200).json({total: 0, page: req.query.page as string, pageSize: req.query.pageSize as string, data: []});
             };
             const result: reqContratoDTO[] = response.map((dados) => {
                 return {
@@ -113,11 +133,22 @@ export default class ContratoController {
                         bairro: dados.cliente.bairro,
                         complemento: dados.cliente.complemento,
                         datacadastro: dados.cliente.datacadastro,
-                        cidade: null
+                        cidade: {
+                            id: dados.cliente.cidade.id,
+                            nome: dados.cliente.cidade.nome,
+                            estadoid: dados.cliente.cidade.estadoid,
+                            codigoibge: dados.cliente.cidade.codigoibge,
+                            estado: {
+                                id: dados.cliente.cidade.estado.id,
+                                nome: dados.cliente.cidade.estado.nome,
+                                uf: dados.cliente.cidade.estado.uf,
+                                pais: dados.cliente.cidade.estado.pais
+                            }
+                        }
                     }
                 };
             });
-            return { data: result, total: total, page: req.query.page as string, pageSize: req.query.pageSize as string };
+            return res.status(200).json({total: total, page: req.query.page as string, pageSize: req.query.pageSize as string, data: result});
         } catch (error) {
             if(error instanceof Error){
                 const tratamento = await tratamentoError(error);

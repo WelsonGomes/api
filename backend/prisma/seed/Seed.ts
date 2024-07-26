@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { publicCidades } from "./execucao/Cidades";
+import { publicCidades } from './execucao/Cidades';
 import { publicEstados } from "./execucao/Estados";
 
 

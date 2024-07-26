@@ -1,15 +1,19 @@
 import { PrismaClient } from "@prisma/client";
-import { publicCidades } from './execucao/Cidades';
 import { publicEstados } from "./execucao/Estados";
+import { publicCidades } from "./execucao/Cidades";
+import CriarCheck from "./execucao/CriarChecks";
+
 
 
 const prisma = new PrismaClient();
 
 async function main() {
     const publicarEstado = false;
-    const publicarCidade = true;
+    const publicarCidade = false;
+    const criarCheck = true;
     if(publicarEstado){ await publicEstados() };
     if(publicarCidade){ await publicCidades() };
+    if(criarCheck){ await CriarCheck() };
 };
 
 main().catch(e => {

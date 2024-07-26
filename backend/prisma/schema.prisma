@@ -119,6 +119,12 @@ model tbendereco {
   complemento String
 }
 
+model tbtipopessoa {
+  id Int @id @default(autoincrement())
+  descricao String @db.VarChar(100) @unique
+  pessoa tbpessoa[]
+}
+
 model tbpessoa {
   id Int @id @default(autoincrement())
   codigo Int
@@ -127,13 +133,15 @@ model tbpessoa {
   cpf String @db.VarChar(11) @unique
   datanascimento DateTime
   sexo Int
-  tipofisicoid Int
-  tipofisico tbtipofisico @relation(fields: [tipofisicoid], references: [id])
-  nivelatividadeid Int
-  nivelatividade tbnivelatividade @relation(fields: [nivelatividadeid], references: [id])
-  objetivoid Int
-  objetivo tbobjetivo @relation(fields: [objetivoid], references: [id])
+  tipofisicoid Int?
+  tipofisico tbtipofisico? @relation(fields: [tipofisicoid], references: [id])
+  nivelatividadeid Int?
+  nivelatividade tbnivelatividade? @relation(fields: [nivelatividadeid], references: [id])
+  objetivoid Int?
+  objetivo tbobjetivo? @relation(fields: [objetivoid], references: [id])
   situacao Int 
+  tipopessoaid Int
+  tipopessoa tbtipopessoa @relation(fields: [tipopessoaid], references: [id])
   contato tbcontato[]
   endereco tbendereco[]
 }

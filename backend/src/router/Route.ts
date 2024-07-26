@@ -9,6 +9,7 @@ import ContratoController from '../controller/ContratoController';
 import TipoFisicoController from '../controller/TipoFisicoController';
 import NivelAtividadeController from '../controller/NivelAtividadeController';
 import ObjetivoController from '../controller/ObjetivoController';
+import ContatoController from '../controller/ContatoController';
 
 dotenv.config();
 
@@ -270,5 +271,15 @@ router.put('/Objetivo', ObjetivoController.updateObjetivo);
 router.delete('/Objetivo', ObjetivoController.deleteObjetivo);
 
 router.get('/Objetivo', ObjetivoController.selectObjetivo);
+
+/************************ROTAS DO OBJETO CONTATO**************************/
+
+router.post('/Contato', ContatoController.createContato);
+
+router.put('/Contato', ContatoController.updateContato);
+
+router.delete('/Contato', ContatoController.deleteContato);
+
+router.get('/Contato', ContatoController.selectContato);
 
 module.exports = router;

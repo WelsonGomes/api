@@ -99,9 +99,9 @@ model tbcontato {
   id Int @id @default(autoincrement())
   pessoaid Int
   pessoa tbpessoa @relation(fields: [pessoaid], references: [id])
-  telefone String @db.VarChar(10)
-  celular String @db.VarChar(11)
-  email String @db.VarChar(100) @unique
+  telefone String? @db.VarChar(10)
+  celular String? @db.VarChar(11)
+  email String? @db.VarChar(100) @unique
 }
 
 model tbendereco {

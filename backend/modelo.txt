@@ -1,0 +1,13 @@
+    static async NOME_DO_PROCESSO(req: Request, res: Response) {
+        try {
+            await req.prisma.$transaction(async () => {
+
+            });
+            return res.status(200).json({msg: ''})
+        } catch (error) {
+            const tratamento = await tratamentoError(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg})
+        } finally {
+            await req.prisma.$disconnect();
+        };
+    };

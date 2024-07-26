@@ -63,8 +63,6 @@ CREATE TABLE "tbpessoa" (
     "situacao" INTEGER NOT NULL,
 
     CONSTRAINT "tbpessoa_pkey" PRIMARY KEY ("id")
-
-    CONSTRAINT "check_situacao" CHECK ("situacao" IN (0, 1))
 );
 
 -- CreateIndex

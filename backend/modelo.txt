@@ -1,6 +1,6 @@
     static async NOME_DO_PROCESSO(req: Request, res: Response) {
         try {
-            await req.prisma.$transaction(async () => {
+            await req.prisma.$transaction(async (prismaTransaction) => {
 
             });
             return res.status(200).json({msg: ''})

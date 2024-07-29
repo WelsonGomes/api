@@ -1,4 +1,4 @@
-import { Request, response, Response } from 'express';
+import { Request, Response } from 'express';
 import { tratamentoError } from "../messaging/Excepitions";
 import dotenv from 'dotenv';
 

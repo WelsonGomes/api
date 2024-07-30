@@ -289,8 +289,8 @@ router.post('/Professor', PessoaController.createPessoa);
 
 /*router.put('/Professor', PessoaController.updateContato);
 
-router.delete('/Professor', PessoaController.deleteContato);
+router.delete('/Professor', PessoaController.deleteContato);*/
 
-router.get('/Professor', PessoaController.selectContato);*/
+router.get('/Professor', PessoaController.selectPessoa);
 
 module.exports = router;

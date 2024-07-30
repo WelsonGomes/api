@@ -10,6 +10,7 @@ import TipoFisicoController from '../controller/TipoFisicoController';
 import NivelAtividadeController from '../controller/NivelAtividadeController';
 import ObjetivoController from '../controller/ObjetivoController';
 import ContatoController from '../controller/ContatoController';
+import PessoaController from '../controller/PessoaController';
 
 dotenv.config();
 
@@ -281,5 +282,15 @@ router.put('/Contato', ContatoController.updateContato);
 router.delete('/Contato', ContatoController.deleteContato);
 
 router.get('/Contato', ContatoController.selectContato);
+
+/************************ROTAS DO OBJETO PROFESSOR**************************/
+
+router.post('/Professor', PessoaController.createPessoa);
+
+/*router.put('/Professor', PessoaController.updateContato);
+
+router.delete('/Professor', PessoaController.deleteContato);
+
+router.get('/Professor', PessoaController.selectContato);*/
 
 module.exports = router;

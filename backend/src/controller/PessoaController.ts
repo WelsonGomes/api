@@ -1,11 +1,15 @@
 import { Request, Response} from 'express';
 import { tratamentoError } from '../messaging/Excepitions';
 import dotenv from 'dotenv';
+import { getValidaCpfCnpj } from '../functions/Validacoes';
 dotenv.config();
 
 export default class PessoaController {
     static async createPessoa(req: Request, res: Response) {
         try {
+            if(!await getValidaCpfCnpj(req.body.cpf)){
+                return res.status(400).json({msg: 'Este CPF é inválido. Favor verifique.'})
+            };
             await req.prisma.$transaction(async (prismaTransaction) => {
                 const pessoa = await prismaTransaction.tbpessoa.create({
                     data: {
@@ -13,7 +17,7 @@ export default class PessoaController {
                         nome: req.body.nome,
                         sobrenome: req.body.sobrenome,
                         cpf: req.body.cpf,
-                        datanascimento: new Date(req.body.datanascimento),
+                        datanascimento: new Date(req.body.dataNascimento),
                         sexo: req.body.sexo,
                         ...(req.body.tipofisicoid != undefined && {tipofisicoid: req.body.tipofisicoid}),
                         ...(req.body.nivelatividadeid != undefined && {nivelatividadeid: req.body.nivelatividadeid}),
@@ -47,7 +51,8 @@ export default class PessoaController {
             return res.status(200).json({msg: 'Novo cadastro realizado com sucesso.'});
         } catch (error) {
             const tratamento = await tratamentoError(error);
-            return res.status(tratamento.status).json({msg: tratamento.msg})
+            console.log(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg});
         } finally {
             await req.prisma.$disconnect();
         };

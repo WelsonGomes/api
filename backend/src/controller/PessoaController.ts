@@ -59,19 +59,105 @@ export default class PessoaController {
         };
     };
 
+    static async updatePessoa(req: Request, res: Response) {
+        try {
+            if(!await getValidaCpfCnpj(req.body.cpf)){
+                return res.status(400).json({msg: 'Este CPF é inválido. Favor verifique.'})
+            };
+                        
+            await req.prisma.$transaction(async (prismaTransaction) => {
+                const pessoa = await prismaTransaction.tbpessoa.update({
+                    where: { id: parseInt(req.query.id as string), situacao: 1 },
+                    data: {
+                        codigo: req.body.codigo,
+                        nome: req.body.nome,
+                        sobrenome: req.body.sobrenome,
+                        cpf: req.body.cpf,
+                        datanascimento: new Date(req.body.dataNascimento),
+                        sexo: req.body.sexo,
+                        ...(req.body.tipofisicoid != undefined && {tipofisicoid: req.body.tipofisicoid}),
+                        ...(req.body.nivelatividadeid != undefined && {nivelatividadeid: req.body.nivelatividadeid}),
+                        ...(req.body.objetivoid != undefined && {objetivoid: req.body.objetivoid}),
+                        situacao: req.body.situacao,
+                        tipopessoaid: req.body.tipopessoaid
+                    }
+                });
+                const contato = await prismaTransaction.tbcontato.update({
+                    where: { id: parseInt(req.body.contato.id) },
+                    data: {
+                        pessoaid: pessoa.id,
+                        telefone: req.body.contato.telefone,
+                        celular: req.body.contato.celular,
+                        email: req.body.contato.email
+                    }
+                });
+                const endereco = await prismaTransaction.tbendereco.update({
+                    where: { id: parseInt(req.body.endereco.id) },
+                    data: {
+                        pessoaid: pessoa.id,
+                        cep: req.body.endereco.cep,
+                        rua: req.body.endereco.rua,
+                        numero: req.body.endereco.numero,
+                        cidadeid: req.body.endereco.cidadeid,
+                        bairro: req.body.endereco.bairro,
+                        estadoid: req.body.endereco.estadoid,
+                        complemento: req.body.endereco.complemento
+                    }
+                });
+                return { pessoa, contato, endereco };
+            });
+            return res.status(200).json({msg: 'Cadastro atualizado com sucesso.'});
+        } catch (error) {
+            const tratamento = await tratamentoError(error);
+            console.log(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg});
+        } finally {
+            await req.prisma.$disconnect();
+        };
+    };
+
+    static async deletePessoa(req: Request, res: Response) {
+        try {
+            await req.prisma.$transaction(async (prismaTransaction) => {
+                const pessoa = await prismaTransaction.tbpessoa.update({
+                    where: { id: parseInt(req.query.id as string), situacao: 1 },
+                    data: {
+                        situacao: 0
+                    }
+                });
+                const contato = await prismaTransaction.tbcontato.deleteMany({
+                    where: { pessoaid: pessoa.id }
+                });
+                const endereco = await prismaTransaction.tbendereco.deleteMany({
+                    where: { pessoaid: pessoa.id }
+                });
+                return { pessoa, contato, endereco };
+            });
+            return res.status(200).json({msg: 'Registro deletado com sucesso'});
+        } catch (error) {
+            const tratamento = await tratamentoError(error);
+            console.log(error);
+            return res.status(tratamento.status).json({msg: tratamento.msg})
+        } finally {
+            await req.prisma.$disconnect();
+        };
+    };
+
     static async selectPessoa(req: Request, res: Response) {
         try {
             if(req.query.id){
-                return res.status(200).json(await req.prisma.tbpessoa.findUnique({ where: { id: parseInt(req.query.id as string,10) }}));
+                return res.status(200).json(await req.prisma.tbpessoa.findUnique({ where: { id: parseInt(req.query.id as string,10), situacao: 1 }}));
             };
             const skip = (parseInt(req.query.page as string,10) - 1) * parseInt(req.query.pageSize as string,10);
             const take = parseInt(req.query.pageSize as string,10);
-            const total = await req.prisma.tbpessoa.count();
+            const total = await req.prisma.tbpessoa.count({ where: { situacao: 1 }});
             const response = await req.prisma.tbpessoa.findMany({
+                where: { situacao: 1 },
                 skip: skip,
                 take: take,
                 orderBy: {nome: 'asc'},
-                include: { tipofisico: true, 
+                include: { 
+                    tipofisico: true, 
                     nivelatividade: true, 
                     objetivo: true, 
                     tipopessoa: true,

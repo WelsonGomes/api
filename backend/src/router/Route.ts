@@ -287,9 +287,9 @@ router.get('/Contato', ContatoController.selectContato);
 
 router.post('/Professor', PessoaController.createPessoa);
 
-/*router.put('/Professor', PessoaController.updateContato);
+router.put('/Professor', PessoaController.updatePessoa);
 
-router.delete('/Professor', PessoaController.deleteContato);*/
+router.delete('/Professor', PessoaController.deletePessoa);
 
 router.get('/Professor', PessoaController.selectPessoa);
 

@@ -76,7 +76,11 @@ export default class ContratoController {
         try {
             await req.prisma.$transaction(async (prismaTransaction) => {
                 return prismaTransaction.tbcontrato.update({ 
-                    where: { id: parseInt(req.query.id as string) }, 
+                    where: { 
+                        id: parseInt(req.query.id as string), 
+                        clienteid: parseInt(req.query.cliente as string),
+                        status: 1
+                    }, 
                     data: { status: 0 }
                 });
             });
@@ -94,8 +98,17 @@ export default class ContratoController {
             let id = parseInt(req.query.id as string,10);
 
             if(id > 0) {
-                const response = await req.prisma.tbcontrato.findUnique({ where: { id: parseInt(req.query.id as string) }});
-                return res.status(200).json({ page: req.query.page as string, pageSize: req.query.pageSize as string, data: response });
+                const response = await req.prisma.tbcontrato.findUnique({ 
+                    where: { 
+                        id: parseInt(req.query.id as string),
+                        status: 1
+                    }
+                });
+                return res.status(200).json({ 
+                    page: req.query.page as string, 
+                    pageSize: req.query.pageSize as string, 
+                    data: response 
+                });
             };
 
             let skip = parseInt(req.query.page as string,10);
@@ -107,10 +120,23 @@ export default class ContratoController {
                 skip: skip,
                 take: take,
                 orderBy: { dtinicio: 'asc' },
-                include: { cliente: { include: { cidade: {include: { estado: true } } } } }
+                include: { 
+                    cliente: { 
+                        include: { 
+                            cidade: {
+                                include: { estado: true } 
+                            } 
+                        } 
+                    } 
+                }
             });
             if(!response.length){
-                return res.status(200).json({total: 0, page: req.query.page as string, pageSize: req.query.pageSize as string, data: []});
+                return res.status(200).json({
+                    total: 0, 
+                    page: req.query.page as string, 
+                    pageSize: req.query.pageSize as string, 
+                    data: []
+                });
             };
             const result: reqContratoDTO[] = response.map((dados) => {
                 return {
@@ -164,7 +190,12 @@ export default class ContratoController {
                     }
                 };
             });
-            return res.status(200).json({total: total, page: req.query.page as string, pageSize: req.query.pageSize as string, data: result});
+            return res.status(200).json({
+                total: total, 
+                page: req.query.page as string, 
+                pageSize: req.query.pageSize as string, 
+                data: result
+            });
         } catch (error) {
             const tratamento = await tratamentoError(error);
             return res.status(tratamento.status).json({msg: tratamento.msg});

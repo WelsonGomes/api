@@ -95,13 +95,22 @@ async function updateCliente(prisma: PrismaClient, cliente: ClienteDTO, id: numb
 async function deleteCliente(prisma: PrismaClient, id: number): Promise<{status: number, msg: string}> {
     try {
         const result = await prisma.$transaction(async (prismaTransaction) => {
-            //const cliente = await prismaTransaction.tbcliente.findUnique({ where: { id: id } });
-            //if (cliente) {
-                await prismaTransaction.tbcliente.delete({ where: { id: id }}); 
-                return { status: 200, msg: 'Cliente deletado com sucesso.' };
-            //} else {
-            //    return { status: 400, msg: 'Não foi possível encontrar o cliente.' };
-            //}
+            const response = await prismaTransaction.tbcontrato.findUnique({
+                where: {
+                    id: id,
+                    status: 1
+                }
+            });
+            if(response){
+                return { status: 400, msg: 'Não é possível excluir um cliente com contrato ativo.' };
+            };
+            await prismaTransaction.tbcliente.update({ 
+                where: { id: id, situacao: 1 },
+                data: {
+                    situacao: 0
+                }
+            }); 
+            return { status: 200, msg: 'Cliente deletado com sucesso.' };
         });
         return result;
     } catch (error) {

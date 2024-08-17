@@ -11,20 +11,32 @@ export default class PessoaController {
             if(!await getValidaCpfCnpj(req.body.cpf)){
                 return res.status(400).json({msg: 'Este CPF é inválido. Favor verifique.'})
             };
+            let tPessoa = 0;
+            const rota = req.route.path as string;
+            switch (rota){
+                case '/Professor':
+                    tPessoa = 1;
+                    break;
+                case '/Aluno':
+                    tPessoa = 2;
+                    break;
+                default:
+                    return res.status(400).json({msg: 'Não foi possível identificar o tipo da pessoa.'});
+            };
             await req.prisma.$transaction(async (prismaTransaction) => {
                 const pessoa = await prismaTransaction.tbpessoa.create({
                     data: {
                         codigo: req.body.codigo,
                         nome: req.body.nome,
                         sobrenome: req.body.sobrenome,
-                        cpf: req.body.cpf,
-                        datanascimento: new Date(req.body.dataNascimento),
+                        cpf: req.body.cpf.replace(/[^\d]+/g, ''),
+                        datanascimento: new Date(req.body.datanascimento),
                         sexo: req.body.sexo,
                         ...(req.body.tipofisicoid != undefined && {tipofisicoid: req.body.tipofisicoid}),
                         ...(req.body.nivelatividadeid != undefined && {nivelatividadeid: req.body.nivelatividadeid}),
                         ...(req.body.objetivoid != undefined && {objetivoid: req.body.objetivoid}),
                         situacao: req.body.situacao,
-                        tipopessoaid: req.body.tipopessoaid
+                        tipopessoaid: tPessoa
                     }
                 });
                 const contato = await prismaTransaction.tbcontato.create({
@@ -51,8 +63,8 @@ export default class PessoaController {
             });
             return res.status(200).json({msg: 'Novo cadastro realizado com sucesso.'});
         } catch (error) {
+            console.log(error)
             const tratamento = await tratamentoError(error);
-            console.log(error);
             return res.status(tratamento.status).json({msg: tratamento.msg});
         } finally {
             await req.prisma.$disconnect();
@@ -64,26 +76,42 @@ export default class PessoaController {
             if(!await getValidaCpfCnpj(req.body.cpf)){
                 return res.status(400).json({msg: 'Este CPF é inválido. Favor verifique.'})
             };
-                        
+            let tPessoa = 0;
+            const rota = req.route.path as string;
+            switch (rota){
+                case '/Professor':
+                    tPessoa = 1;
+                    break;
+                case '/Aluno':
+                    tPessoa = 2;
+                    break;
+                default:
+                    return res.status(400).json({msg: 'Não foi possível identificar o tipo da pessoa.'});
+            };
             await req.prisma.$transaction(async (prismaTransaction) => {
                 const pessoa = await prismaTransaction.tbpessoa.update({
-                    where: { id: parseInt(req.query.id as string), situacao: 1 },
+                    where: { 
+                        id: parseInt(req.query.id as string), 
+                        situacao: 1 
+                    },
                     data: {
                         codigo: req.body.codigo,
                         nome: req.body.nome,
                         sobrenome: req.body.sobrenome,
-                        cpf: req.body.cpf,
-                        datanascimento: new Date(req.body.dataNascimento),
+                        cpf: req.body.cpf.replace(/[^\d]+/g, ''),
+                        datanascimento: new Date(req.body.datanascimento),
                         sexo: req.body.sexo,
                         ...(req.body.tipofisicoid != undefined && {tipofisicoid: req.body.tipofisicoid}),
                         ...(req.body.nivelatividadeid != undefined && {nivelatividadeid: req.body.nivelatividadeid}),
                         ...(req.body.objetivoid != undefined && {objetivoid: req.body.objetivoid}),
                         situacao: req.body.situacao,
-                        tipopessoaid: req.body.tipopessoaid
+                        tipopessoaid: tPessoa
                     }
                 });
                 const contato = await prismaTransaction.tbcontato.update({
-                    where: { id: parseInt(req.body.contato.id) },
+                    where: { 
+                        id: parseInt(req.body.contato.id) 
+                    },
                     data: {
                         pessoaid: pessoa.id,
                         telefone: req.body.contato.telefone,
@@ -92,7 +120,9 @@ export default class PessoaController {
                     }
                 });
                 const endereco = await prismaTransaction.tbendereco.update({
-                    where: { id: parseInt(req.body.endereco.id) },
+                    where: { 
+                        id: parseInt(req.body.endereco.id) 
+                    },
                     data: {
                         pessoaid: pessoa.id,
                         cep: req.body.endereco.cep,
@@ -120,7 +150,10 @@ export default class PessoaController {
         try {
             await req.prisma.$transaction(async (prismaTransaction) => {
                 const pessoa = await prismaTransaction.tbpessoa.update({
-                    where: { id: parseInt(req.query.id as string), situacao: 1 },
+                    where: { 
+                        id: parseInt(req.query.id as string), 
+                        situacao: 1 
+                    },
                     data: {
                         situacao: 0
                     }
@@ -136,7 +169,6 @@ export default class PessoaController {
             return res.status(200).json({msg: 'Registro deletado com sucesso'});
         } catch (error) {
             const tratamento = await tratamentoError(error);
-            console.log(error);
             return res.status(tratamento.status).json({msg: tratamento.msg})
         } finally {
             await req.prisma.$disconnect();
@@ -146,7 +178,12 @@ export default class PessoaController {
     static async selectPessoa(req: Request, res: Response) {
         try {
             if(req.query.id){
-                return res.status(200).json(await req.prisma.tbpessoa.findUnique({ where: { id: parseInt(req.query.id as string,10), situacao: 1 }}));
+                return res.status(200).json(await req.prisma.tbpessoa.findUnique({ 
+                    where: { 
+                        id: parseInt(req.query.id as string,10), 
+                        situacao: 1 
+                    }
+                }));
             };
             const skip = (parseInt(req.query.page as string,10) - 1) * parseInt(req.query.pageSize as string,10);
             const take = parseInt(req.query.pageSize as string,10);
@@ -170,7 +207,8 @@ export default class PessoaController {
                                 }
                             }
                         }
-                    } }
+                    } 
+                }
             });
             if(!response) {
                 return res.status(200).json([]);
@@ -235,7 +273,6 @@ export default class PessoaController {
             return res.status(200).json({page: skip, pageSize: take, total: total, dados: pessoa});
         } catch (error) {
             const tratamento = await tratamentoError(error);
-            console.log(error);
             return res.status(tratamento.status).json({msg: tratamento.msg});
         };
     };

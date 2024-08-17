@@ -127,6 +127,9 @@ async function selectCliente(prisma: PrismaClient, page: number = 1, pageSize: n
         const take = pageSize;
         const total = await prisma.tbcliente.count();
         const response = await prisma.tbcliente.findMany({
+            where: {
+                situacao: 1
+            },
             skip: skip,
             take: take,
             orderBy: { razaosocial: 'asc' },
@@ -180,8 +183,14 @@ async function selectCliente(prisma: PrismaClient, page: number = 1, pageSize: n
 async function selectClienteId(prisma: PrismaClient, id: number): Promise<reqClienteDTO | null> {
     try {
         const response = await prisma.tbcliente.findUnique({ 
-            where: { id: id },
-            include: { estado: true, cidade: true }
+            where: { 
+                id: id, 
+                situacao: 1 
+            },
+            include: { 
+                estado: true, 
+                cidade: true 
+            }
         });
         if(!response) {
             return null;

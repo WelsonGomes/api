@@ -25,6 +25,7 @@ const NivelAtividadeController_1 = __importDefault(require("../controller/NivelA
 const ObjetivoController_1 = __importDefault(require("../controller/ObjetivoController"));
 const ContatoController_1 = __importDefault(require("../controller/ContatoController"));
 const PessoaController_1 = __importDefault(require("../controller/PessoaController"));
+const UsuarioController_1 = __importDefault(require("../controller/UsuarioController"));
 dotenv_1.default.config();
 /************************ROTAS DO OBJETO ESTADO**************************/
 //rota para cadastrar um novo estado
@@ -287,5 +288,10 @@ router.post('/Professor', PessoaController_1.default.createPessoa);
 router.put('/Professor', PessoaController_1.default.updatePessoa);
 router.delete('/Professor', PessoaController_1.default.deletePessoa);
 router.get('/Professor', PessoaController_1.default.selectPessoa);
+/************************ROTAS DO OBJETO USUARIO**************************/
+router.post('/Usuario', UsuarioController_1.default.createUsuario);
+router.put('/Usuario', UsuarioController_1.default.updateUsuario);
+router.delete('/Usuario', UsuarioController_1.default.deleteUsuario);
+router.get('/Usuario', UsuarioController_1.default.selectUsuario);
 module.exports = router;
 //# sourceMappingURL=Route.js.map

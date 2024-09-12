@@ -4,6 +4,7 @@ import cors from 'cors';
 const route = require('./router/Route');
 import { PrismaClient } from '@prisma/client';
 import { prismaMiddleware } from './middleware/conexao/PrismaMiddleware';
+import Login from './login/login';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 const port = process.env.SERVICE_PORT;
   
 app.use(prismaMiddleware);
+app.post('/login', Login.validacao);
 app.use(route);
 
 app.listen(port, () => {

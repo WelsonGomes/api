@@ -144,4 +144,16 @@ model tbpessoa {
   tipopessoa tbtipopessoa @relation(fields: [tipopessoaid], references: [id])
   contato tbcontato[]
   endereco tbendereco[]
+  usuario tbusuario[]
+}
+
+model tbusuario {
+  id Int @id @default(autoincrement())
+  pessoaid Int
+  pessoa tbpessoa @relation(fields: [pessoaid], references: [id])
+  permissao String
+  usuario String @db.VarChar(50)
+  password String
+  situacao Int
+  dtacadastro DateTime
 }

@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 
 async function main() {
     const publicarEstado = false;
-    const publicarCidade = false;
-    const restricao = true;
+    const publicarCidade = true;
+    const restricao = false;
     if(publicarEstado){ await publicEstados() };
     if(publicarCidade){ await publicCidades() };
     if(restricao){ await criarCheck() };

@@ -158,6 +158,7 @@ export interface ContatoDTO {
 }
 
 export interface PessoaDTO {
+    id: number;
     codigo: number;
     nome: string;
     sobrenome: string;
@@ -171,4 +172,27 @@ export interface PessoaDTO {
     tipopessoa: TipopessoaDTO;
     contato: ContatoDTO[] | null;
     endereco: EnderecoDTO[] | null;
+}
+
+export interface UsuarioDTO {
+    id: number;
+    pessoaid: number;
+    permissao: string;
+    usuario: string;
+    password: string;
+    situacao: number;
+    dtacadastro: Date;
+    pessoa: PessoaDTO | null;
+}
+
+export interface UsuarioLogin {
+    user: string;
+    password: string;
+}
+
+export interface UsuarioLogadoDTO {
+    id: number;
+    pessoaid: number;
+    nome: string;
+    permissao: string;
 }

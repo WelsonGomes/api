@@ -92,207 +92,107 @@ export default class UsuarioController {
 
     static async selectUsuario(req: Request, res: Response) {
         try {
-            console.log("Buscando os usuários do sistema");
-            if(req.query.id){
-                console.log("Buscando o usuário com id " + req.query.id);
-                const response = await req.prisma.tbusuario.findUnique({ 
-                    where: { 
-                        id: parseInt(req.query.id as string,10), 
-                        situacao: 1 
-                    },
-                    include: { 
-                        pessoa: {
-                            include: {
-                                tipofisico: true, 
-                                nivelatividade: true, 
-                                objetivo: true, 
-                                tipopessoa: true,
-                                contato: true, 
-                                endereco: {
-                                    include: {
-                                        cidade: {
-                                            include: {
-                                                estado: true
-                                            }
+            console.log("Buscando todos os usuários");
+            const skip = (parseInt(req.query.page as string,10) - 1) * parseInt(req.query.pageSize as string,10);
+            const take = parseInt(req.query.pageSize as string,10);
+            console.log("Buscando o total de registro na base");
+            const total = await req.prisma.tbusuario.count({ where: { situacao: 1 }});
+            const id = parseInt(req.query.id as string,10);
+            const dados = await req.prisma.tbusuario.findMany({ 
+                where: { situacao: 1, ...(id && { id }) },
+                include: { 
+                    pessoa: {
+                        include: {
+                            tipofisico: true, 
+                            nivelatividade: true, 
+                            objetivo: true, 
+                            tipopessoa: true,
+                            contato: true, 
+                            endereco: {
+                                include: {
+                                    cidade: {
+                                        include: {
+                                            estado: true
                                         }
                                     }
                                 }
                             }
-                        } 
-                    }
-                });
-                if(response){
-                    console.log("Encontrado o usuário " + response.pessoa.nome + ' ' + response.pessoa.sobrenome)
-                    const user: UsuarioDTO =  {
-                        id: response.id,
-                        pessoaid: response.pessoaid,
-                        permissao: response.permissao,
-                        usuario: response.usuario,
-                        password: "",
-                        situacao: response.situacao,
-                        dtacadastro: response.dtacadastro,
-                        pessoa: {
-                            id: response.pessoa.id,
-                            codigo: response.pessoa.codigo,
-                            nome: response.pessoa.nome,
-                            sobrenome: response.pessoa.sobrenome,
-                            cpf: response.pessoa.cpf,
-                            sexo: response.pessoa.sexo,
-                            datanascimento: response.pessoa.datanascimento,
-                            tipofisico: {
-                                id: response.pessoa.tipofisico?.id ?? null,
-                                descricao: response.pessoa.tipofisico?.descricao ?? null
-                            },
-                            nivelatividade: {
-                                id: response.pessoa.nivelatividade?.id ?? null,
-                                descricao: response.pessoa.nivelatividade?.descricao ?? null
-                            },
-                            objetivo: {
-                                id: response.pessoa.objetivo?.id ?? null,
-                                descricao: response.pessoa.objetivo?.descricao ?? null
-                            },
-                            situacao: response.pessoa.situacao,
-                            tipopessoa: {
-                                id: response.pessoa.tipopessoa.id,
-                                descricao: response.pessoa.tipopessoa.descricao
-                            },
-                            contato: response.pessoa.contato.map((contato) => ({
-                                id: contato.id,
-                                pessoaid: contato.pessoaid,
-                                telefone: contato.telefone ?? null,
-                                celular: contato.celular ?? null,
-                                email: contato.email ?? null
-                            })),
-                            endereco: response.pessoa.endereco.map((endereco) => ({
-                                id: endereco.id,
-                                pessoaid: endereco.pessoaid,
-                                cep: endereco.cep,
-                                rua: endereco.rua,
-                                numero: endereco.numero ?? null,
-                                cidadeid: endereco.cidadeid,
-                                cidade: {
-                                    id: endereco.cidade.id,
-                                    nome: endereco.cidade.nome,
-                                    estado: {
-                                        id: endereco.cidade.estado.id,
-                                        nome: endereco.cidade.estado.nome,
-                                        uf: endereco.cidade.estado.uf,
-                                        pais: endereco.cidade.estado.pais
-                                    },
-                                    codigoibge: endereco.cidade.codigoibge
-                                },
-                                bairro: endereco.bairro,
-                                estadoid: endereco.estadoid,
-                                complemento: endereco.complemento
-                            }))
                         }
-                    };
-                    return res.status(200).json(user);
-                } else {
-                    return res.status(200).json({page: 0, pageSize: 0, total: 0, dados: []});
-                };
-            } else {
-                console.log("Buscando todos os usuários");
-                const skip = (parseInt(req.query.page as string,10) - 1) * parseInt(req.query.pageSize as string,10);
-                const take = parseInt(req.query.pageSize as string,10);
-                const total = await req.prisma.tbusuario.count({ where: { situacao: 1 }});
-                const dados = await req.prisma.tbusuario.findMany({ 
-                    where: { situacao: 1 },
-                    include: { 
-                        pessoa: {
-                            include: {
-                                tipofisico: true, 
-                                nivelatividade: true, 
-                                objetivo: true, 
-                                tipopessoa: true,
-                                contato: true, 
-                                endereco: {
-                                    include: {
-                                        cidade: {
-                                            include: {
-                                                estado: true
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } 
-                    }
-                });
-
-                if(!dados){
-                    console.log("Não foi encontrado usuários");
-                    return res.status(200).json({page: skip, pageSize: take, total: total, dados: []});
-                };
-                console.log("Montando json para retorno do usuários");
-                const usuarios: UsuarioDTO[] = dados.map((response) => {
-                    return {
-                        id: response.id,
-                        pessoaid: response.pessoaid,
-                        permissao: response.permissao,
-                        usuario: response.usuario,
-                        password: "",
-                        situacao: response.situacao,
-                        dtacadastro: response.dtacadastro,
-                        pessoa: {
-                            id: response.pessoa.id,
-                            codigo: response.pessoa.codigo,
-                            nome: response.pessoa.nome,
-                            sobrenome: response.pessoa.sobrenome,
-                            cpf: response.pessoa.cpf,
-                            sexo: response.pessoa.sexo,
-                            datanascimento: response.pessoa.datanascimento,
-                            tipofisico: {
-                                id: response.pessoa.tipofisico?.id ?? null,
-                                descricao: response.pessoa.tipofisico?.descricao ?? null
-                            },
-                            nivelatividade: {
-                                id: response.pessoa.nivelatividade?.id ?? null,
-                                descricao: response.pessoa.nivelatividade?.descricao ?? null
-                            },
-                            objetivo: {
-                                id: response.pessoa.objetivo?.id ?? null,
-                                descricao: response.pessoa.objetivo?.descricao ?? null
-                            },
-                            situacao: response.pessoa.situacao,
-                            tipopessoa: {
-                                id: response.pessoa.tipopessoa.id,
-                                descricao: response.pessoa.tipopessoa.descricao
-                            },
-                            contato: response.pessoa.contato.map((contato) => ({
-                                id: contato.id,
-                                pessoaid: contato.pessoaid,
-                                telefone: contato.telefone ?? null,
-                                celular: contato.celular ?? null,
-                                email: contato.email ?? null
-                            })),
-                            endereco: response.pessoa.endereco.map((endereco) => ({
-                                id: endereco.id,
-                                pessoaid: endereco.pessoaid,
-                                cep: endereco.cep,
-                                rua: endereco.rua,
-                                numero: endereco.numero ?? null,
-                                cidadeid: endereco.cidadeid,
-                                cidade: {
-                                    id: endereco.cidade.id,
-                                    nome: endereco.cidade.nome,
-                                    estado: {
-                                        id: endereco.cidade.estado.id,
-                                        nome: endereco.cidade.estado.nome,
-                                        uf: endereco.cidade.estado.uf,
-                                        pais: endereco.cidade.estado.pais
-                                    },
-                                    codigoibge: endereco.cidade.codigoibge
+                    } 
+                }
+            });
+            if(!dados){
+                console.log("Não foi encontrado usuários");
+                return res.status(200).json({page: skip, pageSize: take, total: total, dados: []});
+            };
+            console.log("Montando json para retorno do usuários");
+            const usuarios: UsuarioDTO[] = dados.map((response) => {
+                return {
+                    id: response.id,
+                    pessoaid: response.pessoaid,
+                    permissao: response.permissao,
+                    usuario: response.usuario,
+                    password: "",
+                    situacao: response.situacao,
+                    dtacadastro: response.dtacadastro,
+                    pessoa: {
+                        id: response.pessoa.id,
+                        codigo: response.pessoa.codigo,
+                        nome: response.pessoa.nome,
+                        sobrenome: response.pessoa.sobrenome,
+                        cpf: response.pessoa.cpf,
+                        sexo: response.pessoa.sexo,
+                        datanascimento: response.pessoa.datanascimento,
+                        tipofisico: {
+                            id: response.pessoa.tipofisico?.id ?? null,
+                            descricao: response.pessoa.tipofisico?.descricao ?? null
+                        },
+                        nivelatividade: {
+                            id: response.pessoa.nivelatividade?.id ?? null,
+                            descricao: response.pessoa.nivelatividade?.descricao ?? null
+                        },
+                        objetivo: {
+                            id: response.pessoa.objetivo?.id ?? null,
+                            descricao: response.pessoa.objetivo?.descricao ?? null
+                        },
+                        situacao: response.pessoa.situacao,
+                        tipopessoa: {
+                            id: response.pessoa.tipopessoa.id,
+                            descricao: response.pessoa.tipopessoa.descricao
+                        },
+                        contato: response.pessoa.contato.map((contato) => ({
+                            id: contato.id,
+                            pessoaid: contato.pessoaid,
+                            telefone: contato.telefone ?? null,
+                            celular: contato.celular ?? null,
+                            email: contato.email ?? null
+                        })),
+                        endereco: response.pessoa.endereco.map((endereco) => ({
+                            id: endereco.id,
+                            pessoaid: endereco.pessoaid,
+                            cep: endereco.cep,
+                            rua: endereco.rua,
+                            numero: endereco.numero ?? null,
+                            cidadeid: endereco.cidadeid,
+                            cidade: {
+                                id: endereco.cidade.id,
+                                nome: endereco.cidade.nome,
+                                estado: {
+                                    id: endereco.cidade.estado.id,
+                                    nome: endereco.cidade.estado.nome,
+                                    uf: endereco.cidade.estado.uf,
+                                    pais: endereco.cidade.estado.pais
                                 },
-                                bairro: endereco.bairro,
-                                estadoid: endereco.estadoid,
-                                complemento: endereco.complemento
-                            }))
-                        }
+                                codigoibge: endereco.cidade.codigoibge
+                            },
+                            bairro: endereco.bairro,
+                            estadoid: endereco.estadoid,
+                            complemento: endereco.complemento
+                        }))
                     }
-                });
-                return res.status(200).json({page: skip, pageSize: take, total: total, dados: usuarios});
-            }    
+                }
+            });
+            return res.status(200).json({page: skip, pageSize: take, total: total, dados: usuarios});
         } catch (error) {
             console.log(error)
             const tratamento = await tratamentoError(error);

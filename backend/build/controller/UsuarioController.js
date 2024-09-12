@@ -112,7 +112,7 @@ class UsuarioController {
             }
         });
     }
-    static selectUsuario(req, res) {
+    static select1Usuario(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
             try {
@@ -228,6 +228,8 @@ class UsuarioController {
                     console.log("Buscando todos os usuários");
                     const skip = (parseInt(req.query.page, 10) - 1) * parseInt(req.query.pageSize, 10);
                     const take = parseInt(req.query.pageSize, 10);
+                    console.log("Buscando o total de registro na base");
+                    console.log(req.prisma);
                     const total = yield req.prisma.tbusuario.count({ where: { situacao: 1 } });
                     const dados = yield req.prisma.tbusuario.findMany({
                         where: { situacao: 1 },
@@ -333,6 +335,129 @@ class UsuarioController {
                     });
                     return res.status(200).json({ page: skip, pageSize: take, total: total, dados: usuarios });
                 }
+            }
+            catch (error) {
+                console.log(error);
+                const tratamento = yield (0, Excepitions_1.tratamentoError)(error);
+                return res.status(tratamento.status).json({ msg: tratamento.msg });
+            }
+            finally {
+                yield req.prisma.$disconnect();
+            }
+        });
+    }
+    static selectUsuario(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("Buscando todos os usuários");
+                const skip = (parseInt(req.query.page, 10) - 1) * parseInt(req.query.pageSize, 10);
+                const take = parseInt(req.query.pageSize, 10);
+                console.log("Buscando o total de registro na base");
+                const total = yield req.prisma.tbusuario.count({ where: { situacao: 1 } });
+                const id = parseInt(req.query.id, 10);
+                const dados = yield req.prisma.tbusuario.findMany({
+                    where: Object.assign({ situacao: 1 }, (id && { id })),
+                    include: {
+                        pessoa: {
+                            include: {
+                                tipofisico: true,
+                                nivelatividade: true,
+                                objetivo: true,
+                                tipopessoa: true,
+                                contato: true,
+                                endereco: {
+                                    include: {
+                                        cidade: {
+                                            include: {
+                                                estado: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                if (!dados) {
+                    console.log("Não foi encontrado usuários");
+                    return res.status(200).json({ page: skip, pageSize: take, total: total, dados: [] });
+                }
+                ;
+                console.log("Montando json para retorno do usuários");
+                const usuarios = dados.map((response) => {
+                    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+                    return {
+                        id: response.id,
+                        pessoaid: response.pessoaid,
+                        permissao: response.permissao,
+                        usuario: response.usuario,
+                        password: "",
+                        situacao: response.situacao,
+                        dtacadastro: response.dtacadastro,
+                        pessoa: {
+                            id: response.pessoa.id,
+                            codigo: response.pessoa.codigo,
+                            nome: response.pessoa.nome,
+                            sobrenome: response.pessoa.sobrenome,
+                            cpf: response.pessoa.cpf,
+                            sexo: response.pessoa.sexo,
+                            datanascimento: response.pessoa.datanascimento,
+                            tipofisico: {
+                                id: (_b = (_a = response.pessoa.tipofisico) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : null,
+                                descricao: (_d = (_c = response.pessoa.tipofisico) === null || _c === void 0 ? void 0 : _c.descricao) !== null && _d !== void 0 ? _d : null
+                            },
+                            nivelatividade: {
+                                id: (_f = (_e = response.pessoa.nivelatividade) === null || _e === void 0 ? void 0 : _e.id) !== null && _f !== void 0 ? _f : null,
+                                descricao: (_h = (_g = response.pessoa.nivelatividade) === null || _g === void 0 ? void 0 : _g.descricao) !== null && _h !== void 0 ? _h : null
+                            },
+                            objetivo: {
+                                id: (_k = (_j = response.pessoa.objetivo) === null || _j === void 0 ? void 0 : _j.id) !== null && _k !== void 0 ? _k : null,
+                                descricao: (_m = (_l = response.pessoa.objetivo) === null || _l === void 0 ? void 0 : _l.descricao) !== null && _m !== void 0 ? _m : null
+                            },
+                            situacao: response.pessoa.situacao,
+                            tipopessoa: {
+                                id: response.pessoa.tipopessoa.id,
+                                descricao: response.pessoa.tipopessoa.descricao
+                            },
+                            contato: response.pessoa.contato.map((contato) => {
+                                var _a, _b, _c;
+                                return ({
+                                    id: contato.id,
+                                    pessoaid: contato.pessoaid,
+                                    telefone: (_a = contato.telefone) !== null && _a !== void 0 ? _a : null,
+                                    celular: (_b = contato.celular) !== null && _b !== void 0 ? _b : null,
+                                    email: (_c = contato.email) !== null && _c !== void 0 ? _c : null
+                                });
+                            }),
+                            endereco: response.pessoa.endereco.map((endereco) => {
+                                var _a;
+                                return ({
+                                    id: endereco.id,
+                                    pessoaid: endereco.pessoaid,
+                                    cep: endereco.cep,
+                                    rua: endereco.rua,
+                                    numero: (_a = endereco.numero) !== null && _a !== void 0 ? _a : null,
+                                    cidadeid: endereco.cidadeid,
+                                    cidade: {
+                                        id: endereco.cidade.id,
+                                        nome: endereco.cidade.nome,
+                                        estado: {
+                                            id: endereco.cidade.estado.id,
+                                            nome: endereco.cidade.estado.nome,
+                                            uf: endereco.cidade.estado.uf,
+                                            pais: endereco.cidade.estado.pais
+                                        },
+                                        codigoibge: endereco.cidade.codigoibge
+                                    },
+                                    bairro: endereco.bairro,
+                                    estadoid: endereco.estadoid,
+                                    complemento: endereco.complemento
+                                });
+                            })
+                        }
+                    };
+                });
+                return res.status(200).json({ page: skip, pageSize: take, total: total, dados: usuarios });
             }
             catch (error) {
                 console.log(error);

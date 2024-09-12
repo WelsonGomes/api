@@ -116,9 +116,9 @@ class UsuarioController {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
             try {
-                console.log(req.query.id);
+                console.log("Buscando os usuários do sistema");
                 if (req.query.id) {
-                    console.log('Entrou aqui');
+                    console.log("Buscando o usuário com id " + req.query.id);
                     const response = yield req.prisma.tbusuario.findUnique({
                         where: {
                             id: parseInt(req.query.id, 10),
@@ -146,6 +146,7 @@ class UsuarioController {
                         }
                     });
                     if (response) {
+                        console.log("Encontrado o usuário " + response.pessoa.nome + ' ' + response.pessoa.sobrenome);
                         const user = {
                             id: response.id,
                             pessoaid: response.pessoaid,
@@ -224,6 +225,7 @@ class UsuarioController {
                     ;
                 }
                 else {
+                    console.log("Buscando todos os usuários");
                     const skip = (parseInt(req.query.page, 10) - 1) * parseInt(req.query.pageSize, 10);
                     const take = parseInt(req.query.pageSize, 10);
                     const total = yield req.prisma.tbusuario.count({ where: { situacao: 1 } });
@@ -251,8 +253,11 @@ class UsuarioController {
                         }
                     });
                     if (!dados) {
+                        console.log("Não foi encontrado usuários");
                         return res.status(200).json({ page: skip, pageSize: take, total: total, dados: [] });
                     }
+                    ;
+                    console.log("Montando json para retorno do usuários");
                     const usuarios = dados.map((response) => {
                         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
                         return {

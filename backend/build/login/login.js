@@ -44,8 +44,10 @@ class Login {
     static validacao(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log("Fazendo login");
                 const { user, password } = req.body;
                 const usuario = yield req.prisma.tbusuario.findFirst({ where: { usuario: user, situacao: 1 }, include: { pessoa: true } });
+                console.log("Autenticação para o usuário " + (usuario === null || usuario === void 0 ? void 0 : usuario.pessoa.nome));
                 if (usuario) {
                     if (yield auth.compararSenha(password, usuario.password)) {
                         const result = (0, helper_1.converteUsuario)(usuario);

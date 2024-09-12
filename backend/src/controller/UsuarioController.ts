@@ -92,9 +92,9 @@ export default class UsuarioController {
 
     static async selectUsuario(req: Request, res: Response) {
         try {
-            console.log(req.query.id);
+            console.log("Buscando os usuários do sistema");
             if(req.query.id){
-                console.log('Entrou aqui')
+                console.log("Buscando o usuário com id " + req.query.id);
                 const response = await req.prisma.tbusuario.findUnique({ 
                     where: { 
                         id: parseInt(req.query.id as string,10), 
@@ -122,6 +122,7 @@ export default class UsuarioController {
                     }
                 });
                 if(response){
+                    console.log("Encontrado o usuário " + response.pessoa.nome + ' ' + response.pessoa.sobrenome)
                     const user: UsuarioDTO =  {
                         id: response.id,
                         pessoaid: response.pessoaid,
@@ -191,7 +192,7 @@ export default class UsuarioController {
                     return res.status(200).json({page: 0, pageSize: 0, total: 0, dados: []});
                 };
             } else {
-                
+                console.log("Buscando todos os usuários");
                 const skip = (parseInt(req.query.page as string,10) - 1) * parseInt(req.query.pageSize as string,10);
                 const take = parseInt(req.query.pageSize as string,10);
                 const total = await req.prisma.tbusuario.count({ where: { situacao: 1 }});
@@ -220,8 +221,10 @@ export default class UsuarioController {
                 });
 
                 if(!dados){
+                    console.log("Não foi encontrado usuários");
                     return res.status(200).json({page: skip, pageSize: take, total: total, dados: []});
-                }
+                };
+                console.log("Montando json para retorno do usuários");
                 const usuarios: UsuarioDTO[] = dados.map((response) => {
                     return {
                         id: response.id,

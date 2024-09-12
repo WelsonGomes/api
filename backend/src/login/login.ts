@@ -9,8 +9,10 @@ dotenv.config();
 export default class Login{
     static async validacao(req: Request, res: Response){
         try{
+            console.log("Fazendo login");
             const { user, password } = req.body as UsuarioLogin;
             const usuario = await req.prisma.tbusuario.findFirst({ where: { usuario: user, situacao: 1 }, include: { pessoa: true }});
+            console.log("Autenticação para o usuário "+ usuario?.pessoa.nome);
             if(usuario) {
                 if(await auth.compararSenha(password, usuario.password)) {
                     const result = converteUsuario(usuario);

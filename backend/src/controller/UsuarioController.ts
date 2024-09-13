@@ -96,6 +96,7 @@ export default class UsuarioController {
             const skip = (parseInt(req.query.page as string,10) - 1) * parseInt(req.query.pageSize as string,10);
             const take = parseInt(req.query.pageSize as string,10);
             console.log("Buscando o total de registro na base");
+            req.prisma.$connect();
             const total = await req.prisma.tbusuario.count({ where: { situacao: 1 }});
             const id = parseInt(req.query.id as string,10);
             const dados = await req.prisma.tbusuario.findMany({ 

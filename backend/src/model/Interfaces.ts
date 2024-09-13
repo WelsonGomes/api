@@ -30,10 +30,10 @@ export interface reqCidadeDTO {
 }
 
 export interface PaginatedResponse<T> {
-    data: T[];
-    total: number;
     page: number;
     pageSize: number;
+    total: number;
+    data: T[];
 }
 
 //Interface de dados do objeto de Cliente

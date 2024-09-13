@@ -5,6 +5,7 @@ import { tratamentoError } from '../messaging/Excepitions';
 import { createEstado, deleteEstado, selectEstado, selectEstadoId, updateEstado } from '../controller/EstadoController';
 import { createCidade, deleteCidade, selectCidade, selectCidadeId, updateCidade } from '../controller/CidadeController';
 import { createCliente, deleteCliente, selectCliente, selectClienteId, updateCliente } from '../controller/ClienteController';
+
 import ContratoController from '../controller/ContratoController';
 import TipoFisicoController from '../controller/TipoFisicoController';
 import NivelAtividadeController from '../controller/NivelAtividadeController';
@@ -303,5 +304,6 @@ router.put('/Usuario', UsuarioController.updateUsuario);
 router.delete('/Usuario', UsuarioController.deleteUsuario);
 
 router.get('/Usuario', UsuarioController.selectUsuario);
+
 
 module.exports = router;

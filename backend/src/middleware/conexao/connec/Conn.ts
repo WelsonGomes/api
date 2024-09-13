@@ -13,11 +13,18 @@ export function getPrismaClient(schema: string): PrismaClient {
     const dbpassword = process.env.DATABASE_PASSWORD;
     const url = `postgresql://${dbuser}:${dbpassword}@${dbhost}:${dbport}/${dbname}?schema=${schema}`
     console.log('Cliente para comunicação ' + schema);
-    return new PrismaClient({
+    const prisma = new PrismaClient({
         datasources: {
-            db: {
-                url: url
-            }
+            db: { url }
         }
     });
+
+    try {
+        prisma.$connect(); // Tente conectar explicitamente ao banco de dados
+        console.log("Conexão com o banco de dados estabelecida com sucesso");
+    } catch (err) {
+        console.error("Erro ao conectar ao banco de dados:", err);
+    }
+
+    return prisma;
 };
